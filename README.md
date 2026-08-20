@@ -59,17 +59,14 @@ Run the full pipeline on the offline procedural demo:
 toontra demo --output demo_output
 ```
 
-The procedural demo verifies pipeline execution rather than detector
-accuracy. Process a PNG or JPEG page with:
+The demo is only meant to check that the pipeline runs correctly.
+To process a PNG or JPEG page:
 
 ```console
 toontra process path/to/page.png --output outputs/page
 ```
 
-Long pages can be tiled explicitly:
-
-Pages taller than 1600 pixels are tiled automatically with 256 pixels of
-overlap. The defaults can be overridden when needed:
+Long pages are tiled automatically when they exceed 1600 pixels in height, using 256 pixels of overlap. You can adjust these values if needed:
 
 ```console
 toontra process path/to/long_page.png --output outputs/page \
@@ -115,19 +112,17 @@ returns a list. Box coordinates use half-open `xyxy` bounds, so
 
 ### YOLO26
 
-The bundled default is `Yolo26BubbleDetector`, backed by the approximately
-20 MB `src/toontra/weights/speech_bubble_yolo26s.pt`. It was trained for this
-reconstruction on a public speech-bubble dataset and uses an 800-pixel
-inference size by default.
+`Yolo26BubbleDetector` is the default detector. It uses the bundled
+`speech_bubble_yolo26s.pt` checkpoint, which was fine-tuned for this reconstruction
+on a public speech-bubble dataset. The default inference image size is 800 pixels.
 
 See [docs/model_choices.md](docs/model_choices.md) for training provenance and
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for dependency licenses.
 
 ### MA-Net
 
-`ManetBubbleMasker` uses an MA-Net model with a ResNet34 encoder for
-speech-bubble segmentation. Its approximately 122 MB checkpoint is distributed separately
-and is not included in Git.
+`ManetBubbleMasker` uses an MA-Net model with a ResNet34 encoder for speech-bubble
+segmentation. The checkpoint is distributed separately and is not stored in this repository.
 
 - Filename: `toontra_manet_resnet34_bubble_segmentation.pth`
 - Checkpoint: [toontra-research/toontra-manet-bubble-segmentation](https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation)
@@ -171,13 +166,12 @@ requires `--allow-model-download`. OCR is disabled by default.
 
 ## Long Webtoon Processing
 
-Pages taller than `tile_height` are split into overlapping vertical tiles.
-Detections are converted back to page coordinates, then deduplicated in two
-steps:
+Pages taller than `tile_height` are processed as overlapping vertical tiles. Tile-level
+detections are mapped back to full-page coordinates and deduplicated using tile ownership
+followed by non-maximum suppression (NMS).
 
-1. Tile ownership keeps the detection whose center lies in that tile's half
-   of the overlap.
-2. NMS removes any remaining duplicate detections.
+Tile ownership assigns detections according to the position of their center within the
+overlap region. NMS is then applied to remove any remaining duplicate detections.
 
 After deduplication, each box is expanded once by 5% of its width on the left
 and right and 5% of its height on the top and bottom. The expanded box is used
@@ -253,8 +247,8 @@ toontra = Toontra(
 )
 ```
 
-The RGB input, detection, mask, OCR, and translation contracts are documented
-in [docs/custom_models.md](docs/custom_models.md), with working examples in
+The expected interfaces for RGB input, detection, masking, OCR, and translation are
+documented in [docs/custom_models.md](docs/custom_models.md), with working examples in
 [examples/custom_components.py](examples/custom_components.py). Interfaces
 for text detection, inpainting, font matching, text reinsertion, and image
 enhancement are present but not implemented in this reconstruction.
@@ -263,13 +257,13 @@ enhancement are present but not implemented in this reconstruction.
 
 - Detector performance varies with art style and page layout.
 - `WhiteBubbleMasker` is designed for light bubble interiors; MA-Net is the
-  optional learned alternative.
+  optional segmentation-model alternative.
 - Masking fills selected regions with a flat color and does not reconstruct
   artwork behind text.
 - Transparent inputs are flattened onto white; images above 8 bits per channel
   are rejected.
 - OCR quality depends on the lettering style and external OCR models.
-- Translated text is not typeset back into the page.
+- The pipeline does not place translated text back into the image.
 
 ## Tests
 
@@ -279,9 +273,9 @@ ruff check .
 pytest
 ```
 
-Pipeline and CLI tests use deterministic detector stubs. The bundled YOLO has
-separate contract tests. MA-Net tests require `.[manet]`; its real-checkpoint
-test runs only when `TOONTRA_MANET_CHECKPOINT` points to the checkpoint.
+Most automated tests use lightweight test components so they can run without model
+checkpoints. YOLO and MA-Net have separate model-specific tests. Tests that require
+the MA-Net checkpoint run only when the checkpoint path is provided.
 
 ## License
 
