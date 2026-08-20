@@ -5,7 +5,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from .contracts import BubbleDetector, normalize_detections, validate_gray_mask, validate_rgb_image
-from .geometry import non_max_suppression
+from .geometry import cross_tile_non_max_suppression
 from .models import Box, Detection, GrayMask, RGBImage, Tile
 
 
@@ -30,12 +30,7 @@ def make_vertical_tiles(
     final_start = page_height - tile_height
     starts = list(range(0, final_start + 1, stride))
     if starts[-1] != final_start:
-        # A nearly identical penultimate crop adds work without adding useful
-        # context. Shift that crop to the bottom when it is safe to do so.
-        if len(starts) > 1 and final_start - starts[-1] < overlap:
-            starts[-1] = final_start
-        else:
-            starts.append(final_start)
+        starts.append(final_start)
 
     tiles: list[Tile] = []
     for index, y0 in enumerate(starts):
@@ -102,13 +97,10 @@ def select_owned_detections(
     *,
     page_width: int,
     page_height: int,
+    iou_threshold: float = 0.5,
+    containment_threshold: float = 0.8,
 ) -> list[Detection]:
-    """Keep each candidate whose box center belongs to its source tile's zone.
-
-    This is a linear pass with no pairwise box comparisons: a bubble that
-    appears in two overlapping tiles is kept by whichever tile's half of the
-    overlap contains the box's center, decided purely by geometry.
-    """
+    """Resolve cross-tile duplicates with source-tile ownership as preference."""
     if page_width <= 0 or page_height <= 0:
         raise ValueError("page width and height must be positive")
     ordered = list(tiles)
@@ -129,7 +121,7 @@ def select_owned_detections(
     boundaries = ownership_boundaries(ordered)
     positions = {tile.index: position for position, tile in enumerate(ordered)}
 
-    selected: list[Detection] = []
+    owned: list[bool] = []
     for candidate_index, detection in enumerate(detections):
         if not isinstance(detection, Detection):
             raise ValueError(f"candidate {candidate_index} is not a Detection")
@@ -139,17 +131,20 @@ def select_owned_detections(
         lower = boundaries[position - 1] if position > 0 else None
         upper = boundaries[position] if position < len(boundaries) else None
         center_y_twice = detection.box.y1 + detection.box.y2
-        if lower is not None and center_y_twice < lower:
-            continue
-        if upper is not None and center_y_twice >= upper:
-            continue
         box = detection.box
         if box.x1 < 0 or box.y1 < 0 or box.x2 > page_width or box.y2 > page_height:
             raise ValueError("ownership candidates must already be clipped to the page")
-        selected.append(detection)
+        owned.append(
+            (lower is None or center_y_twice >= lower)
+            and (upper is None or center_y_twice < upper)
+        )
 
-    selected.sort(key=lambda item: (item.box.y1, item.box.x1, -item.score))
-    return selected
+    return cross_tile_non_max_suppression(
+        detections,
+        owned=owned,
+        iou_threshold=iou_threshold,
+        containment_threshold=containment_threshold,
+    )
 
 
 def detect_on_tiles(
@@ -162,9 +157,8 @@ def detect_on_tiles(
 ) -> list[Detection]:
     """Detect on overlapping vertical tiles and resolve seam duplicates.
 
-    Ownership removes most cross-tile duplicates using box centers. NMS is
-    applied to the remaining detections, including cases where detector jitter
-    places one bubble's center inside both neighboring ownership zones.
+    Ownership ranks cross-tile duplicate candidates, while IoU and containment
+    provide the fallback when detector jitter leaves neither copy owned.
     """
     rgb = validate_rgb_image(image)
     page_height, page_width = rgb.shape[:2]
@@ -181,10 +175,13 @@ def detect_on_tiles(
             )
         )
 
-    owned = select_owned_detections(
-        tiles, candidates, page_width=page_width, page_height=page_height
+    return select_owned_detections(
+        tiles,
+        candidates,
+        page_width=page_width,
+        page_height=page_height,
+        iou_threshold=iou_threshold,
     )
-    return non_max_suppression(owned, iou_threshold=iou_threshold)
 
 
 def add_mask_patch(page_mask: GrayMask, box: Box, local_mask: GrayMask) -> None:
