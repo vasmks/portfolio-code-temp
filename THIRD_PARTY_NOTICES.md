@@ -75,13 +75,10 @@ details.
 Applicable upstream dependency, model, and dataset terms should be reviewed
 separately.
 
-## The AI-generated example image
+## AI-generated example image
 
-`examples/source/webtoon_sample_original.png` and the metadata-stripped
-`examples/input/sample_webtoon.png` derived from it were generated with
-ChatGPT as synthetic demonstration artwork. They were not produced by, or
-used to train or evaluate, anything in this repository. See
-[README.md](README.md) for the full note.
+`examples/input/sample_webtoon.png` was generated with ChatGPT as synthetic
+demo artwork. It was not used for training or evaluation.
 
 ## User-provided components
 
