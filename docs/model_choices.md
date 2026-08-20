@@ -22,7 +22,7 @@ padding equals 5% of the box's own width, top/bottom padding equals 5% of its
 own height -- giving roughly 10% width and 10% height growth. This reproduces
 the ROI expansion of the original, unpublished pipeline this repository
 rebuilds. Expansion occurs after deduplication so IoU comparisons use the
-original boxes. Nothing downstream, including `TorchManetMasker`, expands the
+original boxes. Nothing downstream, including `ManetBubbleMasker`, expands the
 box again; see
 [custom_models.md](custom_models.md#optional-ma-net-masker).
 
@@ -40,7 +40,7 @@ needs no model download, GPU, or account.
 
 ## Optional: MA-Net bubble masking
 
-`TorchManetMasker` (`src/toontra/modules/torch_manet_masker.py`) is the
+`ManetBubbleMasker` (`src/toontra/modules/manet_bubble_masker.py`) is the
 learned alternative to `WhiteBubbleMasker`. Its separately distributed
 checkpoint, `toontra_manet_resnet34_bubble_segmentation.pth`, was trained for
 this public reconstruction using Segmentation Models PyTorch's `MAnet` with a
@@ -67,7 +67,7 @@ These results apply to the recorded training run and dataset split.
 The adapter and its runtime (`torch`, `segmentation-models-pytorch`) are
 optional and are installed with `pip install -e ".[manet]"`; the rest of
 Toontra does not require them. The checkpoint is distributed separately and
-is not stored in Git or included in package data. `TorchManetMasker` requires
+is not stored in Git or included in package data. `ManetBubbleMasker` requires
 an explicit checkpoint path, does not download weights, and does not select
 `WhiteBubbleMasker` automatically. See
 [custom_models.md](custom_models.md#optional-ma-net-masker) for the
