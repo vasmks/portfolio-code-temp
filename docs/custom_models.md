@@ -126,17 +126,3 @@ flattened onto a white background before they enter the pipeline.
 
 See [model_choices.md](model_choices.md) for checkpoint provenance and
 evaluation results.
-
-## Model metadata checklist
-
-Before sharing an adapter, record:
-
-- model name and version or immutable revision;
-- source and model-card URLs;
-- code and weight licenses;
-- training dataset and its usage rights;
-- expected input normalization and output schema;
-- SHA-256 checksum for each downloaded artifact;
-- tested hardware, runtime, and known failure modes.
-
-Toontra never downloads a model at import time. Keep weights outside Git.
