@@ -11,6 +11,8 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+import numpy as np
+
 from toontra.contracts import validate_rgb_image
 from toontra.models import Box, Detection, ModelMetadata, RGBImage
 
@@ -57,8 +59,9 @@ class Yolo26BubbleDetector:
     def detect(self, image: RGBImage) -> list[Detection]:
         rgb = validate_rgb_image(image)
         height, width = rgb.shape[:2]
+        bgr = np.ascontiguousarray(rgb[..., ::-1])
         results = self._model.predict(
-            rgb,
+            bgr,
             conf=self.confidence_threshold,
             iou=self.iou_threshold,
             imgsz=self.imgsz,
