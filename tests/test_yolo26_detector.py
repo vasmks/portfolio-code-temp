@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import numpy as np
 
+from toontra.imaging import load_rgb
 from toontra.modules import Yolo26BubbleDetector
+
+SAMPLE_IMAGE = Path(__file__).resolve().parents[1] / "examples" / "input" / "sample_webtoon.png"
 
 
 class Yolo26DetectorContractTests(unittest.TestCase):
@@ -30,6 +36,45 @@ class Yolo26DetectorContractTests(unittest.TestCase):
             self.assertLessEqual(detection.box.y2, 256)
             self.assertTrue(0.0 <= detection.score <= 1.0)
         self.assertIsNotNone(detector.metadata.sha256)
+
+    def test_detect_converts_rgb_to_contiguous_bgr_for_ultralytics(self) -> None:
+        rgb = np.array(
+            [
+                [[10, 20, 30], [40, 50, 60]],
+                [[70, 80, 90], [100, 110, 120]],
+            ],
+            dtype=np.uint8,
+        )
+        predict = Mock(
+            return_value=[SimpleNamespace(boxes=SimpleNamespace(xyxy=[], conf=[]))]
+        )
+        detector = object.__new__(Yolo26BubbleDetector)
+        detector.confidence_threshold = 0.25
+        detector.iou_threshold = 0.7
+        detector.imgsz = 800
+        detector._model = SimpleNamespace(predict=predict)
+
+        self.assertEqual(detector.detect(rgb), [])
+
+        ultralytics_input = predict.call_args.args[0]
+        np.testing.assert_array_equal(ultralytics_input, rgb[..., ::-1])
+        self.assertEqual(ultralytics_input.dtype, np.uint8)
+        self.assertEqual(ultralytics_input.shape, rgb.shape)
+        self.assertTrue(ultralytics_input.flags.c_contiguous)
+
+    def test_real_sample_detection_smoke(self) -> None:
+        image = load_rgb(SAMPLE_IMAGE)
+        height, width = image.shape[:2]
+
+        detections = Yolo26BubbleDetector().detect(image)
+
+        self.assertGreater(len(detections), 0)
+        for detection in detections:
+            self.assertGreaterEqual(detection.box.x1, 0)
+            self.assertGreaterEqual(detection.box.y1, 0)
+            self.assertLessEqual(detection.box.x2, width)
+            self.assertLessEqual(detection.box.y2, height)
+            self.assertTrue(0.0 <= detection.score <= 1.0)
 
     def test_detect_is_sorted_top_to_bottom(self) -> None:
         image = np.full((512, 384, 3), 255, dtype=np.uint8)
