@@ -122,15 +122,16 @@ See [docs/model_choices.md](docs/model_choices.md) for training provenance and
 
 ### MA-Net
 
-`TorchManetMasker` is an optional MA-Net/ResNet34 model. Its approximately
-122 MB checkpoint is distributed separately and is not included in Git.
+`BubbleMasker` uses an MA-Net model with a ResNet34 encoder for speech-bubble
+segmentation. Its approximately 122 MB checkpoint is distributed separately
+and is not included in Git.
 
 - Filename: `toontra_manet_resnet34_bubble_segmentation.pth`
-- Download placeholder: `MA_NET_CHECKPOINT_URL`
+- Checkpoint: [toontra-research/toontra-manet-bubble-segmentation](https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation)
 - Optional dependencies: `python -m pip install -e ".[manet]"`
 
-Supply the checkpoint path explicitly; the adapter does not download or
-select weights automatically.
+Supply the checkpoint path explicitly; the model is not downloaded
+automatically.
 
 ```console
 toontra process page.png --output outputs/page \
@@ -140,15 +141,17 @@ toontra process page.png --output outputs/page \
 
 ```python
 from toontra import Toontra
-from toontra.modules import TorchManetMasker
+from toontra.modules import BubbleMasker
 
-masker = TorchManetMasker("weights/toontra_manet_resnet34_bubble_segmentation.pth")
+masker = BubbleMasker(
+    "weights/toontra_manet_resnet34_bubble_segmentation.pth"
+)
 toontra = Toontra(masker=masker)
 ```
 
-The checkpoint was trained for this reconstruction on Roboflow
-`manga-segment_v2`, version 5. Preprocessing and checkpoint metadata are
-documented in [docs/custom_models.md](docs/custom_models.md).
+The checkpoint was trained on Roboflow `manga-segment_v2`, version 5.
+Preprocessing and checkpoint metadata are documented in
+[docs/custom_models.md](docs/custom_models.md).
 
 ### OCR
 
