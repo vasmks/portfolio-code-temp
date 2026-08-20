@@ -1,7 +1,6 @@
 # TOONTRA Public Reconstruction
 
-TOONTRA is a public reconstruction of selected parts of a webtoon localization
-system I worked on professionally.
+This repository recreates parts of a webtoon localization system I previously worked on.
 
 The original production code, internal datasets, and company-trained weights
 are not included. This version uses public datasets and separately trained
