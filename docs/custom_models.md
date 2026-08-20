@@ -63,11 +63,9 @@ from toontra import Toontra
 toontra = Toontra(detector=MyBubbleDetector())
 ```
 
-The rest of the pipeline -- tiling, ownership, cross-tile NMS, box
-expansion, masking, OCR, translation -- only ever sees the `Detection`
-objects your detector's `detect()` returns; it never depends on YOLO26 or
-Ultralytics types. See `docs/model_choices.md` for the bundled checkpoint's
-provenance.
+Downstream pipeline stages use the `Detection` objects returned by `detect()`,
+rather than YOLO26- or Ultralytics-specific types. See `docs/model_choices.md`
+for the bundled checkpoint provenance.
 
 ## Stages with no bundled model
 
