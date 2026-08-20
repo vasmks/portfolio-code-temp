@@ -69,8 +69,12 @@ toontra process path/to/page.png --output outputs/page
 
 Long pages can be tiled explicitly:
 
+Pages taller than 1600 pixels are tiled automatically with 256 pixels of
+overlap. The defaults can be overridden when needed:
+
 ```console
-toontra process path/to/long_page.png --output outputs/page --tile-height 1600 --tile-overlap 256
+toontra process path/to/long_page.png --output outputs/page \
+    --tile-height 2000 --tile-overlap 320
 ```
 
 The output directory contains `cleaned.png`, `mask.png`, `overlay.png`, and
