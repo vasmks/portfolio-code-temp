@@ -37,7 +37,7 @@ _EXPECTED_METADATA: dict[str, object] = {
 }
 
 
-class TorchManetMasker:
+class ManetBubbleMasker:
     """Segment a bubble crop with the MA-Net/ResNet34 checkpoint.
 
     The crop is expected to already include whatever expansion the caller's
@@ -178,14 +178,14 @@ def _import_optional_dependencies() -> tuple[Any, Any]:
         torch = importlib.import_module("torch")
     except ImportError as error:
         raise OptionalDependencyError(
-            "TorchManetMasker requires the 'manet' optional dependencies; "
+            "ManetBubbleMasker requires the 'manet' optional dependencies; "
             'install Toontra with `pip install -e ".[manet]"`'
         ) from error
     try:
         smp = importlib.import_module("segmentation_models_pytorch")
     except ImportError as error:
         raise OptionalDependencyError(
-            "TorchManetMasker requires segmentation-models-pytorch; "
+            "ManetBubbleMasker requires segmentation-models-pytorch; "
             'install Toontra with `pip install -e ".[manet]"`'
         ) from error
     return torch, smp
