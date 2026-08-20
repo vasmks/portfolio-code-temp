@@ -106,26 +106,26 @@ constructs, then a strict `load_state_dict` into
 classes=1, activation=None)`. A mismatched or malformed checkpoint raises
 `ModelContractError` instead of being silently coerced.
 
-Preprocessing reproduces the training pipeline: RGB input, resized to fit
-within 512 x 512 with aspect ratio preserved, centered on a white 512 x 512
-canvas (letterbox padding), ImageNet mean/std normalization. Inference runs
-the model, applies sigmoid, thresholds at the checkpoint's own recorded
-threshold (pass `threshold=` to override it), strips the letterbox padding,
-and resizes the binary mask back to the original crop size with
-nearest-neighbor interpolation -- so the returned mask lines up with the crop
-pixel-for-pixel. See [model_choices.md](model_choices.md) for where that
-checkpoint came from and its evaluation numbers.
+`ManetBubbleMasker` expects an RGB crop and uses the same preprocessing as the
+training pipeline. The crop is resized to fit within 512 × 512 while preserving
+its aspect ratio, placed on a white canvas, and normalized with ImageNet mean
+and standard deviation values.
 
-The crop this adapter receives has already been expanded by the pipeline
-(`DETECTION_EXPANSION_RATIO` in `pipeline.py`); `ManetBubbleMasker` does not
-expand it again.
+After inference, the predicted mask is thresholded using the value stored in
+the checkpoint. A different threshold can be supplied with `threshold=`. The
+padding is then removed and the mask is resized back to the original crop size.
 
-To run the opt-in local integration test without putting a weight path in the
-repository, set `TOONTRA_MANET_CHECKPOINT` (optionally `TOONTRA_MANET_DEVICE`).
+The crop passed to `ManetBubbleMasker` has already been expanded by the main
+pipeline, so the masker does not apply any additional expansion.
 
-Input files are decoded as 8-bit RGB. PNG transparency is flattened onto white
-at the file boundary. A model adapter never needs to interpret BGR or alpha
-channels unless it chooses to use them internally.
+For local testing with the real checkpoint, set `TOONTRA_MANET_CHECKPOINT`.
+`TOONTRA_MANET_DEVICE` can also be set to choose the inference device.
+
+Images loaded from files are converted to 8-bit RGB. Transparent PNGs are
+flattened onto a white background before they enter the pipeline.
+
+See [model_choices.md](model_choices.md) for checkpoint provenance and
+evaluation results.
 
 ## Model metadata checklist
 
