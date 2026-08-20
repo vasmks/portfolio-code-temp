@@ -30,7 +30,7 @@ RGB page
 ```
 
 `Yolo26BubbleDetector` and the weight-free `WhiteBubbleMasker` are the
-defaults. `TorchManetMasker` is an optional learned masker that requires a
+defaults. `ManetBubbleMasker` is an optional learned masker that requires a
 separately distributed checkpoint. Each stage is replaceable through the
 contracts described in [docs/custom_models.md](docs/custom_models.md).
 
@@ -122,8 +122,8 @@ See [docs/model_choices.md](docs/model_choices.md) for training provenance and
 
 ### MA-Net
 
-`BubbleMasker` uses an MA-Net model with a ResNet34 encoder for speech-bubble
-segmentation. Its approximately 122 MB checkpoint is distributed separately
+`ManetBubbleMasker` uses an MA-Net model with a ResNet34 encoder for
+speech-bubble segmentation. Its approximately 122 MB checkpoint is distributed separately
 and is not included in Git.
 
 - Filename: `toontra_manet_resnet34_bubble_segmentation.pth`
@@ -141,9 +141,9 @@ toontra process page.png --output outputs/page \
 
 ```python
 from toontra import Toontra
-from toontra.modules import BubbleMasker
+from toontra.modules import ManetBubbleMasker
 
-masker = BubbleMasker(
+masker = ManetBubbleMasker(
     "weights/toontra_manet_resnet34_bubble_segmentation.pth"
 )
 toontra = Toontra(masker=masker)
