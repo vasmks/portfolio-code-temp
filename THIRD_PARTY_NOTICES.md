@@ -50,7 +50,7 @@ checkpoint: `src/toontra/weights/speech_bubble_yolo26s.pt`.
 - Segmentation Models PyTorch license: MIT
 - Behavior: both packages are installed only through the optional `manet`
   extra (`pip install -e ".[manet]"`) and are never required by the base
-  install. `TorchManetMasker` performs no model download; the checkpoint
+  install. `ManetBubbleMasker` performs no model download; the checkpoint
   path is always supplied explicitly.
 - Optional checkpoint: `toontra_manet_resnet34_bubble_segmentation.pth` was
   trained for this public reconstruction (MA-Net, `resnet34` encoder) on the public
