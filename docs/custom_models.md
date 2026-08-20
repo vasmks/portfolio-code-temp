@@ -69,11 +69,9 @@ for the bundled checkpoint provenance.
 
 ## Stages with no bundled model
 
-These interfaces document stages that existed in the original pipeline but
-are not implemented in this public reconstruction: `TextDetector`,
-`Inpainter`, `FontMatcher`, `TextReinserter`, and `ImageEnhancer`. `Toontra`
-does not accept them as constructor arguments; they are technical contracts,
-not executable pipeline stages.
+The original pipeline also included `TextDetector`, `Inpainter`, `FontMatcher`,
+`TextReinserter`, and `ImageEnhancer`. Their interfaces are documented here,
+but these stages are not implemented in this public version.
 
 ## Optional MA-Net masker
 
@@ -86,8 +84,7 @@ not stored in Git or included in package data. Install the optional runtime:
 pip install -e ".[manet]"
 ```
 
-Pass the checkpoint path explicitly -- there is no default and the adapter
-never downloads weights:
+`ManetBubbleMasker` requires a checkpoint path and does not download the model automatically.
 
 ```python
 from toontra import Toontra
