@@ -21,21 +21,23 @@ checkpoint: `src/toontra/weights/speech_bubble_yolo26s.pt`.
 
 - Source: <https://github.com/ultralytics/ultralytics>
 - License: Ultralytics YOLO code and models are available under AGPL-3.0,
-  with commercial licensing available separately. The bundled detector and
-  its fine-tuned checkpoint therefore remain subject to the applicable
-  Ultralytics license terms.
+  with commercial licensing available separately.
 - Base model: Ultralytics YOLO26s, initialized from the official pretrained
   `yolo26s.pt` checkpoint.
 - Training dataset:
   [Roboflow 100-VL `speech-bubbles-detection-r22zt-ou0u6-jols`](https://universe.roboflow.com/rf100-vl/speech-bubbles-detection-r22zt-ou0u6-jols)
-- Dataset license: MIT.
-- Dataset classes: `Elipse`, `cloude`, `other`, `rectangle`, `sea_uchirin`,
-  and `thorn`. Toontra merged these into a single `speech_bubble` class for
-  training.
+- Dataset workspace: `rf100-vl`
+- Dataset project: `speech-bubbles-detection-r22zt-ou0u6-jols`
+- Dataset version: 1
+- Dataset license: MIT
+- Export format: YOLOv8
+- Source classes: `Elipse`, `cloude`, `other`, `rectangle`, `sea_uchirin`,
+  and `thorn`. These were merged into Toontra's single `speech_bubble`
+  class for training.
 - Bundled checkpoint:
   `src/toontra/weights/speech_bubble_yolo26s.pt`
 - SHA-256: `6E2EBF2820CC0D0A55D1737C126AAC0B73B427E079566B844A4CD156F1804BAC`
-- This checkpoint was trained specifically for this public reconstruction
+- The checkpoint was trained specifically for this public reconstruction
   and is not an original TOONTRA production checkpoint.
 
 See [docs/model_choices.md](docs/model_choices.md) for training and evaluation
