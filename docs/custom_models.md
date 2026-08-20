@@ -79,7 +79,7 @@ not executable pipeline stages.
 
 ## Optional MA-Net masker
 
-`TorchManetMasker` is a ready-made adapter for the optional MA-Net/ResNet34
+`ManetBubbleMasker` is a ready-made adapter for the optional MA-Net/ResNet34
 speech-bubble checkpoint (Segmentation Models PyTorch `MAnet`, `resnet34`
 encoder, one output class). The checkpoint is distributed separately and is
 not stored in Git or included in package data. Install the optional runtime:
@@ -93,9 +93,9 @@ never downloads weights:
 
 ```python
 from toontra import Toontra
-from toontra.modules import TorchManetMasker
+from toontra.modules import ManetBubbleMasker
 
-masker = TorchManetMasker(
+masker = ManetBubbleMasker(
     "weights/toontra_manet_resnet34_bubble_segmentation.pth",
     device="auto",
 )
@@ -122,7 +122,7 @@ pixel-for-pixel. See [model_choices.md](model_choices.md) for where that
 checkpoint came from and its evaluation numbers.
 
 The crop this adapter receives has already been expanded by the pipeline
-(`DETECTION_EXPANSION_RATIO` in `pipeline.py`); `TorchManetMasker` does not
+(`DETECTION_EXPANSION_RATIO` in `pipeline.py`); `ManetBubbleMasker` does not
 expand it again.
 
 To run the opt-in local integration test without putting a weight path in the
