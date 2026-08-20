@@ -29,9 +29,9 @@ RGB page
 ```
 
 `Yolo26BubbleDetector` and the weight-free `WhiteBubbleMasker` are the
-defaults. `ManetBubbleMasker` is an optional learned masker that requires a
-separately distributed checkpoint. Each stage is replaceable through the
-contracts described in [docs/custom_models.md](docs/custom_models.md).
+defaults. `ManetBubbleMasker` is an optional MA-Net-based alternative that uses
+a separate checkpoint. Custom implementations can be used for the other pipeline
+components as well; see [docs/custom_models.md](docs/custom_models.md).
 
 ## Installation
 
