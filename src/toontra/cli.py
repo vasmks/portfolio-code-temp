@@ -68,7 +68,7 @@ def _add_pipeline_arguments(parser: argparse.ArgumentParser) -> None:
         default=None,
         help="Path to the MA-Net checkpoint (required with --masker manet)",
     )
-    parser.add_argument("--tile-height", type=int, default=None)
+    parser.add_argument("--tile-height", type=int, default=1600)
     parser.add_argument("--tile-overlap", type=int, default=256)
     parser.add_argument(
         "--duplicate-iou",
