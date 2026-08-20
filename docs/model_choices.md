@@ -8,28 +8,41 @@ they came from, and how they are loaded.
 `Yolo26BubbleDetector` (`src/toontra/modules/yolo26_bubble_detector.py`) is
 the default and only bundled `BubbleDetector` implementation. Its checkpoint,
 `src/toontra/weights/speech_bubble_yolo26s.pt`, was trained for this public
-rewrite with Ultralytics, initialized from the official pretrained `yolo26s.pt`,
-and fine-tuned on the public Roboflow "speech-bubbles-detection" dataset
-(manga pages; several annotated bubble-shape classes merged into Toontra's
-single `speech_bubble` label). See
-[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the Ultralytics license.
+reconstruction with Ultralytics, starting from the official pretrained
+`yolo26s.pt` checkpoint.
 
-`Toontra`'s default processing chain for this detector is: tiled inference on
-tall pages, cross-tile ownership, cross-tile NMS, then one ROI
-expansion of each surviving box (`Toontra(detection_expansion_ratio=0.05)`,
-the default). The ratio is applied independently per axis -- left/right
-padding equals 5% of the box's own width, top/bottom padding equals 5% of its
-own height -- giving roughly 10% width and 10% height growth. This reproduces
-the ROI expansion of the original, unpublished pipeline this repository
-rebuilds. Expansion occurs after deduplication so IoU comparisons use the
-original boxes. Nothing downstream, including `ManetBubbleMasker`, expands the
-box again; see
-[custom_models.md](custom_models.md#optional-ma-net-masker).
+Training used version 1 of the Roboflow 100-VL
+[`speech-bubbles-detection-r22zt-ou0u6-jols`](https://universe.roboflow.com/rf100-vl/speech-bubbles-detection-r22zt-ou0u6-jols)
+dataset from workspace `rf100-vl`. The dataset was downloaded through the
+Roboflow Python SDK in YOLOv8 export format. This refers to the annotation
+format only; the detector trained for this reconstruction is YOLO26s.
 
-Training-run numbers (from the raw Kaggle artifacts) and an independent,
-manually annotated webtoon benchmark are both under
-[evaluation/](../evaluation/); the README's Evaluation section summarizes
-both, kept as separate tables since they measure different things.
+The source dataset contains six bubble-shape classes: `Elipse`, `cloude`,
+`other`, `rectangle`, `sea_uchirin`, and `thorn`. These were merged into a
+single `speech_bubble` class for training. The dataset is published under the
+MIT license. See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for
+dataset, Ultralytics, and checkpoint licensing information.
+
+The bundled checkpoint is:
+
+- File: `src/toontra/weights/speech_bubble_yolo26s.pt`
+- Base checkpoint: `yolo26s.pt`
+- Training dataset version: 1
+- Training image size: 800
+- SHA-256: `6E2EBF2820CC0D0A55D1737C126AAC0B73B427E079566B844A4CD156F1804BAC`
+
+`Toontra` processes tall pages with tiled inference, followed by tile
+ownership and cross-tile NMS. Each surviving detection is then expanded once
+by 5% of its width on the left and right and 5% of its height on the top and
+bottom, giving roughly 10% growth in each dimension. Expansion happens after
+deduplication, so duplicate comparisons use the original detection boxes.
+Downstream components, including `ManetBubbleMasker`, do not expand the box
+again. See [custom_models.md](custom_models.md#optional-ma-net-masker).
+
+Training-run results from the retained Kaggle artifacts and results from the
+independent manually annotated webtoon benchmark are stored under
+[evaluation/](../evaluation/). The README reports them separately because
+they measure different datasets and evaluation settings.
 
 ## Bubble masking
 
