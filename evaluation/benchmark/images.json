@@ -1,0 +1,22 @@
+{
+  "images": [
+    {
+      "id": "01",
+      "file": "01",
+      "annotation_count": 204,
+      "source_url": "WEBTOON_01_URL"
+    },
+    {
+      "id": "02",
+      "file": "02",
+      "annotation_count": 40,
+      "source_url": "WEBTOON_02_URL"
+    },
+    {
+      "id": "03",
+      "file": "03",
+      "annotation_count": 123,
+      "source_url": "WEBTOON_03_URL"
+    }
+  ]
+}

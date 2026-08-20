@@ -1,0 +1,19 @@
+{
+  "dataset": {
+    "webtoons": 3,
+    "annotations": 367
+  },
+  "result": {
+    "tp": 333,
+    "fp": 10,
+    "fn": 34,
+    "precision": 0.971,
+    "recall": 0.907,
+    "f1": 0.938
+  },
+  "deduplication": {
+    "nms_only_false_positives": 15,
+    "ownership_plus_nms_false_positives": 10,
+    "recall": 0.907
+  }
+}
