@@ -233,8 +233,8 @@ padding on `manga-segment_v2` version 5.
 
 The benchmark contains three source images with 204, 40, and 123 annotations,
 respectively. Source artwork is not redistributed. Dataset documentation,
-source URL placeholders, and the annotation-file release requirement are in
-[evaluation/benchmark/README.md](evaluation/benchmark/README.md).
+annotations, and official source links are in
+[evaluation/benchmark/](evaluation/benchmark/).
 
 ## Custom Components
 
