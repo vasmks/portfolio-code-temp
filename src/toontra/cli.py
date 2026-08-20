@@ -118,9 +118,9 @@ def _run_process(args: argparse.Namespace) -> int:
     if args.masker == "manet":
         if args.manet_checkpoint is None:
             raise ToontraError("--manet-checkpoint is required when --masker manet is selected")
-        from .modules import TorchManetMasker
+        from .modules import ManetBubbleMasker
 
-        masker = TorchManetMasker(args.manet_checkpoint, device=args.device)
+        masker = ManetBubbleMasker(args.manet_checkpoint, device=args.device)
 
     toontra = Toontra(
         masker=masker,
