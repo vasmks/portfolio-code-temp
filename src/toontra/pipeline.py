@@ -41,7 +41,7 @@ class Toontra:
         recognizer: TextRecognizer | None = None,
         translator: Translator | None = None,
         *,
-        tile_height: int | None = None,
+        tile_height: int | None = 1600,
         tile_overlap: int = 256,
         duplicate_iou: float = 0.5,
         detection_expansion_ratio: float = DETECTION_EXPANSION_RATIO,
