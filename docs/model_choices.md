@@ -53,11 +53,11 @@ needs no model download, GPU, or account.
 
 ## Optional: MA-Net bubble masking
 
-`ManetBubbleMasker` (`src/toontra/modules/manet_bubble_masker.py`) is the
-learned alternative to `WhiteBubbleMasker`. Its separately distributed
-checkpoint, `toontra_manet_resnet34_bubble_segmentation.pth`, was trained for
-this public reconstruction using Segmentation Models PyTorch's `MAnet` with a
-`resnet34` encoder, fine-tuned on the public Roboflow
+`ManetBubbleMasker` (`src/toontra/modules/manet_bubble_masker.py`) provides
+MA-Net-based speech-bubble segmentation as an alternative to `WhiteBubbleMasker`.
+Its separately distributed checkpoint, `toontra_manet_resnet34_bubble_segmentation.pth`,
+was trained for this public reconstruction using Segmentation Models PyTorch's
+`MAnet` with a `resnet34` encoder, fine-tuned on the public Roboflow
 [`manga-segment_v2`](https://universe.roboflow.com/), version 5,
 speech-bubble segmentation dataset. It is a new checkpoint produced by this
 training run, not the original production checkpoint.
