@@ -11,8 +11,8 @@ import numpy as np
 
 from toontra.contracts import BubbleMasker, validate_gray_mask
 from toontra.errors import ModelContractError, OptionalDependencyError
-from toontra.modules import TorchManetMasker
-from toontra.modules.torch_manet_masker import (
+from toontra.modules import ManetBubbleMasker
+from toontra.modules.manet_bubble_masker import (
     _IMAGE_MEAN,
     _IMAGE_STD,
     _preprocess,
@@ -130,24 +130,24 @@ class ConstructorErrorTests(unittest.TestCase):
     def test_missing_checkpoint_gives_a_clear_error(self) -> None:
         missing = Path(self.temporary_directory.name) / "does-not-exist.pth"
         with self.assertRaisesRegex(FileNotFoundError, "does not exist"):
-            TorchManetMasker(missing)
+            ManetBubbleMasker(missing)
 
     def test_missing_optional_dependency_gives_a_clear_error(self) -> None:
         checkpoint = Path(self.temporary_directory.name) / "checkpoint.pth"
         checkpoint.write_bytes(b"not a real checkpoint")
         with patch(
-            "toontra.modules.torch_manet_masker.importlib.import_module",
+            "toontra.modules.manet_bubble_masker.importlib.import_module",
             side_effect=ImportError("no torch"),
         ):
             with self.assertRaises(OptionalDependencyError) as caught:
-                TorchManetMasker(checkpoint)
+                ManetBubbleMasker(checkpoint)
         self.assertIn(".[manet]", str(caught.exception))
 
     def test_rejects_invalid_threshold_override(self) -> None:
         checkpoint = Path(self.temporary_directory.name) / "checkpoint.pth"
         checkpoint.write_bytes(b"not a real checkpoint")
         with self.assertRaises(ValueError):
-            TorchManetMasker(checkpoint, threshold=1.5)
+            ManetBubbleMasker(checkpoint, threshold=1.5)
 
 
 @unittest.skipUnless(_MANET_AVAILABLE, _SKIP_REASON)
@@ -180,7 +180,7 @@ class RealArchitectureTests(unittest.TestCase):
     def test_constructs_known_resnet34_manet_architecture(self) -> None:
         import segmentation_models_pytorch as smp
 
-        masker = TorchManetMasker(self.checkpoint_path)
+        masker = ManetBubbleMasker(self.checkpoint_path)
         self.assertIsInstance(masker._model, smp.MAnet)
 
     def test_no_network_download_during_construction_or_inference(self) -> None:
@@ -190,22 +190,22 @@ class RealArchitectureTests(unittest.TestCase):
             raise AssertionError("attempted to download weights over the network")
 
         with patch.object(torch.hub, "load_state_dict_from_url", side_effect=_fail_download):
-            masker = TorchManetMasker(self.checkpoint_path)
+            masker = ManetBubbleMasker(self.checkpoint_path)
             crop = np.full((64, 96, 3), 200, dtype=np.uint8)
             masker.create_mask(crop)  # no assertion needed; a download would raise above
 
     def test_checkpoint_metadata_is_read_correctly(self) -> None:
-        masker = TorchManetMasker(self.checkpoint_path)
+        masker = ManetBubbleMasker(self.checkpoint_path)
         self.assertEqual(masker.threshold, 0.45)
         self.assertEqual(masker.metadata.version, "Roboflow manga-segment_v2 v5")
         self.assertIsNotNone(masker.metadata.sha256)
 
     def test_threshold_override_takes_precedence_over_checkpoint(self) -> None:
-        masker = TorchManetMasker(self.checkpoint_path, threshold=0.9)
+        masker = ManetBubbleMasker(self.checkpoint_path, threshold=0.9)
         self.assertEqual(masker.threshold, 0.9)
 
     def test_result_follows_the_masker_contract(self) -> None:
-        masker = TorchManetMasker(self.checkpoint_path)
+        masker = ManetBubbleMasker(self.checkpoint_path)
         self.assertIsInstance(masker, BubbleMasker)
         crop = np.full((70, 130, 3), 210, dtype=np.uint8)
         mask = masker.create_mask(crop)
@@ -215,7 +215,7 @@ class RealArchitectureTests(unittest.TestCase):
     def test_sigmoid_threshold_and_padding_removal(self) -> None:
         import torch
 
-        masker = TorchManetMasker(self.checkpoint_path, threshold=0.5)
+        masker = ManetBubbleMasker(self.checkpoint_path, threshold=0.5)
         crop = np.zeros((50, 100, 3), dtype=np.uint8)  # non-square -> real padding
         _, (x0, y0, content_width, content_height) = _preprocess(crop)
         self.assertGreater(y0, 0)  # sanity: this crop really does get padded
@@ -243,11 +243,11 @@ class RealArchitectureTests(unittest.TestCase):
     os.environ.get("TOONTRA_MANET_CHECKPOINT"),
     "set TOONTRA_MANET_CHECKPOINT to run the local MA-Net integration test",
 )
-class TorchManetLocalIntegrationTests(unittest.TestCase):
+class ManetBubbleMaskerLocalIntegrationTests(unittest.TestCase):
     def test_real_checkpoint_obeys_the_mask_contract(self) -> None:
         checkpoint = os.environ["TOONTRA_MANET_CHECKPOINT"]
         device = os.environ.get("TOONTRA_MANET_DEVICE", "cpu")
-        masker = TorchManetMasker(checkpoint, device=device)
+        masker = ManetBubbleMasker(checkpoint, device=device)
 
         crop = np.full((260, 420, 3), 255, dtype=np.uint8)
         crop[100:160, 120:300] = 0
