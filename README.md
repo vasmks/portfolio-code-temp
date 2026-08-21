@@ -200,17 +200,19 @@ Sources:
 ### Independent webtoon benchmark
 
 The full tiled pipeline was evaluated on 367 manually annotated speech
-bubbles across three webtoons.
+bubbles across three webtoons using 1600 px tiles with 256 px overlap.
 
 | Metric | Value |
 | --- | ---: |
-| TP / FP / FN | 333 / 10 / 34 |
-| Precision | 0.971 |
-| Recall | 0.907 |
-| F1 | 0.938 |
+| TP / FP / FN | 329 / 19 / 38 |
+| Precision | 0.945 |
+| Recall | 0.896 |
+| F1 | 0.920 |
 
-NMS alone produced 15 false positives. Tile ownership followed by NMS reduced
-that count to 10 while recall remained 0.907. See
+On this benchmark, ownership-based cross-tile selection followed by same-tile
+NMS produced the same aggregate result as global NMS. The ownership rule can
+change which duplicate is retained near tile boundaries, but with the current
+YOLO26 detector this did not change the final TP, FP, or FN counts. See
 [evaluation/detector_benchmark.json](evaluation/detector_benchmark.json).
 
 ### MA-Net segmentation
