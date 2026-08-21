@@ -215,6 +215,28 @@ change which duplicate is retained near tile boundaries, but with the current
 YOLO26 detector this did not change the final TP, FP, or FN counts. See
 [evaluation/detector_benchmark.json](evaluation/detector_benchmark.json).
 
+### YOLOv7 ownership comparison
+
+To check whether tile ownership was more useful with the older detector used
+during TOONTRA development, the same 367-annotation benchmark was also run with
+YOLOv7 using the same tiling and evaluation settings.
+
+| Method | TP / FP / FN | F1 |
+| --- | ---: | ---: |
+| Global NMS | 323 / 22 / 44 | 0.907 |
+| Ownership + same-tile NMS | 324 / 21 / 43 | 0.910 |
+
+The aggregate improvement was small, but one seam case showed the intended
+behavior clearly. Global NMS kept the higher-confidence detection from the
+neighboring tile, giving IoU 0.496 and missing the 0.50 match threshold.
+Ownership selected the detection from the correct tile region instead, with
+IoU 0.511, recovering that annotation without losing another ground-truth
+match.
+
+With YOLO26, the same ownership strategy changed some selected boxes but did
+not change the aggregate benchmark result. See
+[evaluation/yolov7_ownership_comparison.json](evaluation/yolov7_ownership_comparison.json).
+
 ### MA-Net segmentation
 
 Verified results from [docs/training/manet_results.json](docs/training/manet_results.json):
