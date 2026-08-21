@@ -45,12 +45,27 @@ class TilingTests(unittest.TestCase):
     def test_final_tile_is_shifted_instead_of_stretched(self) -> None:
         image = np.zeros((1800, 100, 3), dtype=np.uint8)
         tiles = make_vertical_tiles(image, tile_height=1024, overlap=256)
-        self.assertEqual([(tile.y0, tile.y1) for tile in tiles], [(0, 1024), (776, 1800)])
+        self.assertEqual(
+            [(tile.y0, tile.y1) for tile in tiles],
+            [(0, 1024), (768, 1792), (776, 1800)],
+        )
 
     def test_page_just_over_one_tile_keeps_the_height_limit(self) -> None:
         image = np.zeros((1025, 100, 3), dtype=np.uint8)
         tiles = make_vertical_tiles(image, tile_height=1024, overlap=256)
         self.assertEqual([(tile.y0, tile.y1) for tile in tiles], [(0, 1024), (1, 1025)])
+
+    def test_regular_tiles_are_not_replaced_by_the_shifted_final_tile(self) -> None:
+        cases = [
+            (1601, [(0, 1600), (1, 1601)]),
+            (3199, [(0, 1600), (1344, 2944), (1599, 3199)]),
+            (3200, [(0, 1600), (1344, 2944), (1600, 3200)]),
+        ]
+        for page_height, expected in cases:
+            with self.subTest(page_height=page_height):
+                image = np.zeros((page_height, 100, 3), dtype=np.uint8)
+                tiles = make_vertical_tiles(image, tile_height=1600, overlap=256)
+                self.assertEqual([(tile.y0, tile.y1) for tile in tiles], expected)
 
     def test_invalid_tiling_options_raise(self) -> None:
         image = np.zeros((20, 20, 3), dtype=np.uint8)
@@ -84,11 +99,73 @@ class TilingTests(unittest.TestCase):
             detector,
             image,
             tile_height=100,
-            overlap=50,
+            overlap=40,
             iou_threshold=0.5,
         )
         self.assertEqual(len(detections), 1)
         self.assertEqual(detections[0].tile_id, 0)
+
+    def test_jittered_seam_copies_cannot_both_fail_ownership(self) -> None:
+        # tile0=[0,100), tile1=[60,160), ownership boundary at y=80.
+        # Detector jitter puts each copy's center in the other tile's zone.
+        image = np.zeros((160, 120, 3), dtype=np.uint8)
+        detector = SequencedStubBubbleDetector(
+            [
+                [Box(32, 72, 88, 92)],  # global center=82, outside tile0 ownership
+                [Box(32, 8, 88, 28)],  # global y=68..88, center=78, outside tile1
+            ]
+        )
+
+        detections = detect_on_tiles(
+            detector,
+            image,
+            tile_height=100,
+            overlap=40,
+            iou_threshold=0.5,
+        )
+
+        self.assertEqual(len(detections), 1)
+        self.assertEqual(detections[0].tile_id, 0)
+
+    def test_unique_unowned_seam_detection_survives(self) -> None:
+        image = np.zeros((160, 120, 3), dtype=np.uint8)
+        detector = SequencedStubBubbleDetector(
+            [
+                [Box(32, 72, 88, 92)],  # center=82, outside tile0 ownership
+                [],
+            ]
+        )
+
+        detections = detect_on_tiles(
+            detector,
+            image,
+            tile_height=100,
+            overlap=40,
+            iou_threshold=0.5,
+        )
+
+        self.assertEqual(len(detections), 1)
+        self.assertEqual(detections[0].tile_id, 0)
+
+    def test_same_tile_overlaps_survive_seam_deduplication(self) -> None:
+        image = np.zeros((160, 120, 3), dtype=np.uint8)
+        detector = SequencedStubBubbleDetector(
+            [
+                [Box(20, 10, 80, 60), Box(22, 10, 82, 60)],
+                [],
+            ]
+        )
+
+        detections = detect_on_tiles(
+            detector,
+            image,
+            tile_height=100,
+            overlap=40,
+            iou_threshold=0.5,
+        )
+
+        self.assertEqual(len(detections), 2)
+        self.assertEqual({item.tile_id for item in detections}, {0})
 
     def test_ownership_uses_the_actual_overlap_midpoint(self) -> None:
         tiles = make_tiles([(0, 100), (50, 150)])

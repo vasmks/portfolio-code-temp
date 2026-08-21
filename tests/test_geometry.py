@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import unittest
 
-from toontra.geometry import intersection_over_smaller, iou, non_max_suppression
+from toontra.geometry import (
+    cross_tile_non_max_suppression,
+    intersection_over_smaller,
+    iou,
+    non_max_suppression,
+)
 from toontra.models import Box, Detection
 
 
@@ -82,6 +87,42 @@ class GeometryTests(unittest.TestCase):
         bottom = Detection(Box(10, 35, 70, 70), 0.85, tile_id=1)
         full = Detection(Box(10, 10, 70, 70), 0.60, tile_id=2)
         kept = non_max_suppression([top, bottom, full], iou_threshold=0.5)
+        self.assertEqual(kept, [full])
+
+    def test_cross_tile_nms_does_not_compare_same_tile_detections(self) -> None:
+        first = Detection(Box(10, 10, 70, 70), 0.9, tile_id=0)
+        second = Detection(Box(12, 10, 72, 70), 0.8, tile_id=0)
+
+        kept = cross_tile_non_max_suppression(
+            [first, second],
+            owned=[True, True],
+            iou_threshold=0.5,
+        )
+
+        self.assertEqual(kept, [first, second])
+
+    def test_cross_tile_nms_uses_ownership_as_a_preference(self) -> None:
+        unowned = Detection(Box(10, 10, 70, 70), 0.95, tile_id=0)
+        owned = Detection(Box(12, 10, 72, 70), 0.70, tile_id=1)
+
+        kept = cross_tile_non_max_suppression(
+            [unowned, owned],
+            owned=[False, True],
+            iou_threshold=0.5,
+        )
+
+        self.assertEqual(kept, [owned])
+
+    def test_cross_tile_nms_keeps_containment_fragment_handling(self) -> None:
+        full = Detection(Box(10, 10, 70, 70), 0.70, tile_id=0)
+        fragment = Detection(Box(10, 25, 70, 50), 0.95, tile_id=1)
+
+        kept = cross_tile_non_max_suppression(
+            [fragment, full],
+            owned=[False, False],
+            iou_threshold=0.5,
+        )
+
         self.assertEqual(kept, [full])
 
 
