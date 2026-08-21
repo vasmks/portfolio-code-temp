@@ -1,0 +1,8 @@
+__pycache__/ 
+*.py[cod] 
+*.egg-info/ 
+.pytest_cache/ 
+.venv/ 
+evaluation/benchmark/local_images/ 
+evaluation/benchmark/local_results/ 
+evaluation/benchmark/local_*.py 
