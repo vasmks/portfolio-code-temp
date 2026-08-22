@@ -12,3 +12,28 @@ episodes are available from the official pages listed below.
 | 01 | 204 | [A Crush Curse — Episode 1](https://www.webtoons.com/en/romance/a-crush-curse/episode-1/viewer?title_no=9858&episode_no=1) |
 | 02 | 40 | [A Spell for a Smith — Episode 1](https://www.webtoons.com/en/fantasy/a-spell-for-a-smith/episode-1/viewer?title_no=6078&episode_no=1) |
 | 03 | 123 | [This Wasn’t in My Adoption Plan! — Episode 1](https://www.webtoons.com/en/drama/this-wasnt-in-my-adoption-plan/episode-1/viewer?title_no=7566&episode_no=1) |
+
+## Reproducing the detector comparison
+
+The repository includes the raw full-page detection candidates used for the
+reported YOLO26 and YOLOv7 comparison. The source webtoon images are not
+required to reproduce the evaluation metrics.
+
+From the repository root:
+
+```bash
+python evaluation/benchmark/evaluate.py
+```
+
+The evaluator reproduces the comparison between:
+
+- global NMS
+- tile ownership followed by same-tile NMS
+
+using the fixed benchmark configuration recorded in
+`predictions/metadata.json`.
+
+The expected aggregate results are also stored in `results.json`.
+
+The cached prediction files contain bounding boxes, confidence scores, labels,
+and source tile IDs only. They do not contain the original webtoon artwork.
