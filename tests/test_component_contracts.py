@@ -4,6 +4,7 @@ import unittest
 
 import numpy as np
 
+from toontra.contracts import validate_translations
 from toontra.errors import ModelContractError
 from toontra.models import Box, Detection
 from toontra.modules import (
@@ -104,6 +105,9 @@ class ComponentContractTests(unittest.TestCase):
         with self.assertRaises(ModelContractError):
             IdentityTranslator().translate("hello", source_language="en", target_language="ko")
 
+    def test_translation_validation_rejects_bare_string(self) -> None:
+        with self.assertRaisesRegex(ModelContractError, "sequence of strings"):
+            validate_translations("abc", 3)
 
 if __name__ == "__main__":
     unittest.main()

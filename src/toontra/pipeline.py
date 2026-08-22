@@ -179,7 +179,11 @@ class Toontra:
             recognitions.append(validate_recognition(recognition))
 
         translations: list[str | None] = [None] * len(detections)
-        if self.translator is not None and target_language is not None:
+        if (
+            self.translator is not None
+            and self.recognizer is not None
+            and target_language is not None
+        ):
             texts = [item.text if item is not None else "" for item in recognitions]
             translated = self.translator.translate(
                 texts,

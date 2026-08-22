@@ -24,6 +24,15 @@ class FixedRecognizer:
     def recognize(self, bubble: np.ndarray, *, language: str) -> Recognition:
         return Recognition(f"{language}:{bubble.shape[1]}", confidence=0.9)
 
+class FailIfCalledTranslator:
+    def translate(
+        self,
+        texts: list[str],
+        *,
+        source_language: str,
+        target_language: str,
+    ) -> list[str]:
+        raise AssertionError("translator should not be called without recognized text")
 
 class BadMasker:
     def create_mask(self, bubble: np.ndarray) -> np.ndarray:
@@ -166,6 +175,19 @@ class PipelineTests(unittest.TestCase):
         pad_y = round(0.05 * box.height)
         expected = Box(box.x1 - pad_x, box.y1 - pad_y, box.x2 + pad_x, box.y2 + pad_y)
         self.assertEqual(expanded.box, expected)
+
+    def test_translator_is_not_called_without_recognizer(self) -> None:
+        result = Toontra(
+            detector=two_bubble_detector(),
+            translator=FailIfCalledTranslator(),
+        ).process(
+            create_synthetic_webtoon(),
+            source_language="ko",
+            target_language="en",
+        )
+
+        self.assertTrue(all(bubble.recognition is None for bubble in result.bubbles))
+        self.assertTrue(all(bubble.translation is None for bubble in result.bubbles))
 
 
 if __name__ == "__main__":

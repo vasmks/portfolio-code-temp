@@ -100,6 +100,9 @@ def validate_recognition(value: Recognition) -> Recognition:
 
 
 def validate_translations(translations: Sequence[str], expected_count: int) -> list[str]:
+    if isinstance(translations, str):
+        raise ModelContractError("Translator output must be a sequence of strings")
+
     try:
         values = list(translations)
     except TypeError as error:
