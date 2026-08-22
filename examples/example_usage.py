@@ -1,6 +1,16 @@
+from pathlib import Path
+
 from toontra import Toontra
 
-image_paths = ["page_01.png", "page_02.png", "page_03.png"]
+sample = (
+    Path(__file__).resolve().parents[1]
+    / "src"
+    / "toontra"
+    / "assets"
+    / "sample_webtoon.png"
+)
+
+image_paths = [sample]
 
 toontra = Toontra()
 results = toontra.process(image_paths)
@@ -12,3 +22,6 @@ for page in results:
         box = bubble.detection.box.as_tuple()
         text = bubble.recognition.text if bubble.recognition else None
         translation = bubble.translation
+
+print(f"Processed {len(results)} page(s)")
+print(f"Detected {sum(len(page.bubbles) for page in results)} bubble(s)")
