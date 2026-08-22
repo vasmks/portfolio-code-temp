@@ -141,9 +141,13 @@ class Toontra:
         ``PageResult`` per item, in the same order.
         """
         if _is_batch(images):
+            if source is not None:
+                raise ValueError("source cannot be used with batch input")
             return [
                 self._process_one(
-                    item, source_language=source_language, target_language=target_language
+                    item,
+                    source_language=source_language,
+                    target_language=target_language,
                 )
                 for item in images
             ]

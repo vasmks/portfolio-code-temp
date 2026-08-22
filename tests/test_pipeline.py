@@ -105,6 +105,13 @@ class PipelineTests(unittest.TestCase):
             self.assertFalse(stale_crop.exists())
             self.assertEqual(unrelated.read_text(encoding="utf-8"), "keep me")
 
+    def test_batch_rejects_single_source_path(self) -> None:
+        image = create_synthetic_webtoon()
+        toontra = Toontra(detector=two_bubble_detector())
+
+        with self.assertRaisesRegex(ValueError, "source cannot be used with batch input"):
+            toontra.process([image, image], source="page.png")
+
     def test_output_never_overwrites_the_source_image(self) -> None:
         image = create_synthetic_webtoon()
         with tempfile.TemporaryDirectory(prefix="toontra-source-") as directory:
