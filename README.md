@@ -220,20 +220,21 @@ Sources:
 
 ### Independent webtoon benchmark
 
-The tiled speech-bubble detector was evaluated on 367 manually annotated
-speech bubbles across three webtoons using 1600 px tiles with 256 px overlap.
+The shipped tiled detector was evaluated on 367 manually annotated speech
+bubbles across three webtoons using 1600 px tiles with 256 px overlap.
 
 | Metric | Value |
 | --- | ---: |
-| TP / FP / FN | 329 / 19 / 38 |
-| Precision | 0.945 |
+| TP / FP / FN | 329 / 25 / 38 |
+| Precision | 0.929 |
 | Recall | 0.896 |
-| F1 | 0.920 |
+| F1 | 0.913 |
 
-On this benchmark, ownership-based cross-tile selection followed by same-tile
-NMS produced the same aggregate result as global NMS. The ownership rule can
-change which duplicate is retained near tile boundaries, but with the current
-YOLO26 detector this did not change the final TP, FP, or FN counts. See
+These results use the same ownership-based cross-tile deduplication as the
+runtime pipeline. A separate experiment added same-tile NMS after ownership
+and reduced the false positives from 25 to 19, giving F1 0.920. Same-tile NMS
+is not used by the shipped pipeline because overlapping detections from the
+same tile can represent separate bubbles. See
 [evaluation/detector_benchmark.json](evaluation/detector_benchmark.json).
 
 ### YOLOv7 ownership comparison
@@ -245,6 +246,7 @@ YOLOv7 using the same tiling and evaluation settings.
 | Method | TP / FP / FN | F1 |
 | --- | ---: | ---: |
 | Global NMS | 323 / 22 / 44 | 0.907 |
+| Runtime ownership + cross-tile NMS | 325 / 24 / 42 | 0.908 |
 | Ownership + same-tile NMS | 324 / 21 / 43 | 0.910 |
 
 The aggregate improvement was small, but one seam case showed the intended
@@ -254,8 +256,9 @@ Ownership selected the detection from the correct tile region instead, with
 IoU 0.511, recovering that annotation without losing another ground-truth
 match.
 
-With YOLO26, the same ownership strategy changed some selected boxes but did
-not change the aggregate benchmark result. See
+With YOLO26, ownership plus same-tile NMS reduced false positives compared
+with the shipped runtime path, but same-tile NMS remains an evaluation
+experiment rather than part of the runtime pipeline. See
 [evaluation/yolov7_ownership_comparison.json](evaluation/yolov7_ownership_comparison.json).
 
 ### MA-Net segmentation

@@ -91,18 +91,17 @@ def ownership_boundaries(tiles: Sequence[Tile]) -> tuple[int, ...]:
     return tuple(boundaries)
 
 
-def select_owned_detections(
+def detection_ownership_flags(
     tiles: Sequence[Tile],
     detections: Sequence[Detection],
     *,
     page_width: int,
     page_height: int,
-    iou_threshold: float = 0.5,
-    containment_threshold: float = 0.8,
-) -> list[Detection]:
-    """Resolve cross-tile duplicates with source-tile ownership as preference."""
+) -> list[bool]:
+    """Return whether each detection belongs to its source tile's ownership zone."""
     if page_width <= 0 or page_height <= 0:
         raise ValueError("page width and height must be positive")
+
     ordered = list(tiles)
     if not ordered:
         raise ValueError("tiles cannot be empty")
@@ -118,6 +117,7 @@ def select_owned_detections(
         for tile in ordered
     ):
         raise ValueError("every tile must be a valid full-width slice of the page")
+
     boundaries = ownership_boundaries(ordered)
     positions = {tile.index: position for position, tile in enumerate(ordered)}
 
@@ -127,17 +127,39 @@ def select_owned_detections(
             raise ValueError(f"candidate {candidate_index} is not a Detection")
         if detection.tile_id is None or detection.tile_id not in positions:
             raise ValueError("every ownership candidate must reference a known tile_id")
+
         position = positions[detection.tile_id]
         lower = boundaries[position - 1] if position > 0 else None
         upper = boundaries[position] if position < len(boundaries) else None
         center_y_twice = detection.box.y1 + detection.box.y2
+
         box = detection.box
         if box.x1 < 0 or box.y1 < 0 or box.x2 > page_width or box.y2 > page_height:
             raise ValueError("ownership candidates must already be clipped to the page")
+
         owned.append(
             (lower is None or center_y_twice >= lower)
             and (upper is None or center_y_twice < upper)
         )
+
+    return owned
+
+def select_owned_detections(
+    tiles: Sequence[Tile],
+    detections: Sequence[Detection],
+    *,
+    page_width: int,
+    page_height: int,
+    iou_threshold: float = 0.5,
+    containment_threshold: float = 0.8,
+) -> list[Detection]:
+    """Resolve cross-tile duplicates with source-tile ownership as preference."""
+    owned = detection_ownership_flags(
+        tiles,
+        detections,
+        page_width=page_width,
+        page_height=page_height,
+    )
 
     return cross_tile_non_max_suppression(
         detections,

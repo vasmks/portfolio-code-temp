@@ -34,10 +34,11 @@ From the repository root:
 python evaluation/benchmark/evaluate.py
 ```
 
-The evaluator reproduces the comparison between:
+The evaluator reports three post-processing configurations:
 
 - global NMS
-- tile ownership followed by same-tile NMS
+- the shipped runtime path: tile ownership with cross-tile NMS
+- tile ownership followed by additional same-tile NMS
 
 using the fixed benchmark configuration recorded in
 `predictions/metadata.json`.

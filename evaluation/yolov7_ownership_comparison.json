@@ -28,6 +28,14 @@
       "recall": 0.8801089918256131,
       "f1": 0.9073033707865168
     },
+    "runtime": {
+      "tp": 325,
+      "fp": 24,
+      "fn": 42,
+      "precision": 0.9312320916905444,
+      "recall": 0.885558583106267,
+      "f1": 0.9078212290502793
+    },
     "ownership_plus_same_tile_nms": {
       "tp": 324,
       "fp": 21,
@@ -56,7 +64,7 @@
   },
   "yolo26_reference": {
     "nms_only_f1": 0.9202797202797203,
-    "ownership_plus_same_tile_nms_f1": 0.9202797202797203,
-    "aggregate_change": false
+    "runtime_f1": 0.912621359223301,
+    "ownership_plus_same_tile_nms_f1": 0.9202797202797203
   }
 }

@@ -6,12 +6,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from toontra.geometry import (
     cross_tile_non_max_suppression,
     iou,
     non_max_suppression,
 )
-from toontra.models import Box, Detection
+from toontra.models import Box, Detection, Tile
+from toontra.tiling import detection_ownership_flags
 
 ROOT = Path(__file__).resolve().parent
 
@@ -120,36 +123,36 @@ def load_raw_candidates(
 def ownership_flags(
     detections: list[Detection],
     tile_spans: list[list[int]],
+    *,
+    page_width: int,
+    page_height: int,
 ) -> list[bool]:
     if not tile_spans:
         raise RuntimeError("tile_spans cannot be empty")
 
-    boundaries = [
-        current[0] + previous[1]
-        for previous, current in zip(tile_spans, tile_spans[1:], strict=False)
+    backing = np.empty((1, page_width, 3), dtype=np.uint8)
+    tiles = [
+        Tile(
+            index=index,
+            image=np.broadcast_to(
+                backing,
+                (end - start, page_width, 3),
+            ),
+            x0=0,
+            y0=start,
+        )
+        for index, (start, end) in enumerate(tile_spans)
     ]
 
-    flags: list[bool] = []
-
-    for detection in detections:
-        if detection.tile_id is None:
-            raise RuntimeError("ownership candidate is missing tile_id")
-
-        position = detection.tile_id
-        if position < 0 or position >= len(tile_spans):
-            raise RuntimeError(f"unknown tile_id: {position}")
-
-        lower = boundaries[position - 1] if position > 0 else None
-        upper = boundaries[position] if position < len(boundaries) else None
-
-        center_y_twice = detection.box.y1 + detection.box.y2
-
-        flags.append(
-            (lower is None or center_y_twice >= lower)
-            and (upper is None or center_y_twice < upper)
+    try:
+        return detection_ownership_flags(
+            tiles,
+            detections,
+            page_width=page_width,
+            page_height=page_height,
         )
-
-    return flags
+    except ValueError as exc:
+        raise RuntimeError(str(exc)) from exc
 
 
 def same_tile_non_max_suppression(
@@ -351,7 +354,12 @@ def evaluate_detector(
             class_aware=True,
         )
 
-        owned = ownership_flags(raw, tile_spans)
+        owned = ownership_flags(
+            raw,
+            tile_spans,
+            page_width=width,
+            page_height=height,
+        )
 
         ownership = cross_tile_non_max_suppression(
             raw,
@@ -368,6 +376,7 @@ def evaluate_detector(
 
         modes = {
             "nms_only": global_nms,
+            "runtime": ownership,
             "ownership_plus_same_tile_nms": ownership_same_tile,
         }
 
@@ -407,6 +416,7 @@ def evaluate_detector(
         "images": results,
         "totals": {
             "nms_only": aggregate(results, "nms_only"),
+            "runtime": aggregate(results, "runtime"),
             "ownership_plus_same_tile_nms": aggregate(
                 results,
                 "ownership_plus_same_tile_nms",
