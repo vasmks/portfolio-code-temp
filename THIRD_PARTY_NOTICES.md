@@ -87,7 +87,7 @@ separately.
 
 ## AI-generated example image
 
-`examples/input/sample_webtoon.png` was generated with ChatGPT as synthetic
+`src/toontra/assets/sample_webtoon.png` was generated with ChatGPT as synthetic
 demo artwork. It was not used for training or evaluation.
 
 ## User-provided components

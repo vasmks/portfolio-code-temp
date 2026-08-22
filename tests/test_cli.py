@@ -34,7 +34,7 @@ class CliTests(unittest.TestCase):
             expected = {"source.png", "cleaned.png", "mask.png", "overlay.png", "result.json"}
             self.assertEqual({path.name for path in output.iterdir()}, expected)
             metadata = json.loads((output / "result.json").read_text(encoding="utf-8"))
-            self.assertGreaterEqual(metadata["bubble_count"], 0)
+            self.assertGreater(metadata["bubble_count"], 0)
             self.assertEqual(len(metadata["bubbles"]), metadata["bubble_count"])
             self.assertEqual(main(["demo", "--output", str(output)]), 2)
             self.assertEqual(main(["demo", "--output", str(output), "--force"]), 0)

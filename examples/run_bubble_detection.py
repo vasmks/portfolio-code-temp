@@ -17,7 +17,7 @@ from toontra.imaging import load_rgb, save_rgb
 from toontra.modules import Yolo26BubbleDetector
 
 HERE = Path(__file__).resolve().parent
-INPUT_IMAGE = HERE / "input" / "sample_webtoon.png"
+INPUT_IMAGE = Path(__file__).resolve().parents[1] / "src" / "toontra" / "assets" / "sample_webtoon.png"
 OUTPUT_DIR = HERE / "output"
 
 

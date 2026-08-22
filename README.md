@@ -53,7 +53,7 @@ Python 3.10 or newer is required.
 
 ### CLI
 
-Run the full pipeline on the offline procedural demo:
+Run the full pipeline on the bundled demo image:
 
 ```console
 toontra demo --output demo_output

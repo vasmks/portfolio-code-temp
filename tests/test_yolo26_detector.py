@@ -10,7 +10,13 @@ import numpy as np
 from toontra.imaging import load_rgb
 from toontra.modules import Yolo26BubbleDetector
 
-SAMPLE_IMAGE = Path(__file__).resolve().parents[1] / "examples" / "input" / "sample_webtoon.png"
+SAMPLE_IMAGE = (
+    Path(__file__).resolve().parents[1]
+    / "src"
+    / "toontra"
+    / "assets"
+    / "sample_webtoon.png"
+)
 
 
 class Yolo26DetectorContractTests(unittest.TestCase):

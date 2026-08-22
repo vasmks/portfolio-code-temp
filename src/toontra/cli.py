@@ -6,9 +6,10 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from .errors import ToontraError
-from .imaging import save_rgb
+from .imaging import load_rgb, save_rgb
 from .pipeline import Toontra
-from .synthetic import create_synthetic_webtoon
+
+SAMPLE_WEBTOON = Path(__file__).resolve().parent / "assets" / "sample_webtoon.png"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,20 +25,8 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_arguments(process)
     _add_pipeline_arguments(process)
 
-    demo = commands.add_parser("demo", help="Run the offline synthetic demo")
+    demo = commands.add_parser("demo", help="Run the offline bundled demo")
     _add_output_arguments(demo)
-    demo.add_argument(
-        "--width",
-        type=int,
-        default=720,
-        help="Synthetic page width (default: 720)",
-    )
-    demo.add_argument(
-        "--height",
-        type=int,
-        default=1080,
-        help="Synthetic page height (default: 1080)",
-    )
     return parser
 
 
@@ -90,7 +79,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _run_demo(args: argparse.Namespace) -> int:
-    source = create_synthetic_webtoon(width=args.width, height=args.height)
+    if not SAMPLE_WEBTOON.is_file():
+        raise FileNotFoundError(f"Missing bundled demo image: {SAMPLE_WEBTOON}")
+    source = load_rgb(SAMPLE_WEBTOON)
     toontra = Toontra()
     result = toontra.process(source)
     destination = result.save(
