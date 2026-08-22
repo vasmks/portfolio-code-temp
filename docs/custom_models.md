@@ -97,11 +97,11 @@ masker = ManetBubbleMasker(
 toontra = Toontra(masker=masker)
 ```
 
-The adapter accepts one checkpoint format. Construction:
-`torch.load(..., weights_only=True)`, verify
-the embedded metadata (`architecture="MAnet"`, `encoder="resnet34"`,
-`in_channels=3`, `classes=1`, `image_size=512`) matches what the code
-constructs, then a strict `load_state_dict` into
+The adapter accepts one checkpoint format. It loads the checkpoint with
+`torch.load(..., weights_only=True)`, verifies that the embedded metadata
+(`architecture="MAnet"`, `encoder="resnet34"`, `in_channels=3`, `classes=1`,
+`image_size=512`) matches the model configuration, and then loads the
+`state_dict` strictly into
 `smp.MAnet(encoder_name="resnet34", encoder_weights=None, in_channels=3,
 classes=1, activation=None)`. A mismatched or malformed checkpoint raises
 `ModelContractError` instead of being silently coerced.

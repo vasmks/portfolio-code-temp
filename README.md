@@ -200,9 +200,11 @@ cleaned.
 
 ## Evaluation
 
-### YOLO26 training validation
+### YOLO26 training-run validation
 
-The best epoch by mAP50-95 was 90 of 100 at image size 800 and batch size 8.
+These metrics come from the retained Ultralytics training artifacts and refer to
+the validation split used during that run. The best epoch by mAP50-95 was 90 of
+100 at image size 800 and batch size 8.
 
 | Metric | Value |
 | --- | ---: |

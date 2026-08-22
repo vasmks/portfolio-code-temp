@@ -44,12 +44,16 @@ independent manually annotated webtoon benchmark are stored under
 [evaluation/](../evaluation/). The README reports them separately because
 they measure different datasets and evaluation settings.
 
+The repository retains the training configuration, results, and the best
+checkpoint from that run. It does not include the Kaggle notebook or a copy of
+the training dataset, so these artifacts document the run rather than provide
+an exact retraining environment.
+
 ## Bubble masking
 
-`WhiteBubbleMasker` is a deterministic, weight-free OpenCV baseline: it looks
-for the white bubble interior around a detection and fills it (and any text
-holes inside it). It works well for light bubbles with a closed outline and
-needs no model download, GPU, or account.
+`WhiteBubbleMasker` is a deterministic, weight-free OpenCV baseline. It looks
+for a light bubble interior with a closed outline and fills it, including text
+holes inside the region. It needs no model download, GPU, or account.
 
 ## Optional: MA-Net bubble masking
 
