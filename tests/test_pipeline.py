@@ -96,6 +96,8 @@ class PipelineTests(unittest.TestCase):
             output = Path(directory) / "page"
             result.save(output, save_crops=True)
             stale_crop = output / "crops" / "bubble_999.png"
+            unrelated_crop = output / "crops" / "bubble_reference.png"
+            unrelated_crop.write_bytes(b"keep me")
             stale_crop.write_bytes(b"stale")
             unrelated = output / "notes.txt"
             unrelated.write_text("keep me", encoding="utf-8")
@@ -103,6 +105,7 @@ class PipelineTests(unittest.TestCase):
             result.save(output, save_crops=False, force=True)
 
             self.assertFalse(stale_crop.exists())
+            self.assertEqual(unrelated_crop.read_bytes(), b"keep me")
             self.assertEqual(unrelated.read_text(encoding="utf-8"), "keep me")
 
     def test_batch_rejects_single_source_path(self) -> None:
@@ -123,6 +126,22 @@ class PipelineTests(unittest.TestCase):
                 result.save(source.parent, force=True)
 
             self.assertEqual(source.read_bytes(), b"original source bytes")
+
+    def test_output_stores_absolute_source_path(self) -> None:
+        image = create_synthetic_webtoon()
+        with tempfile.TemporaryDirectory(prefix="toontra-source-") as directory:
+            source = Path(directory) / "input.png"
+            source.write_bytes(b"original source bytes")
+
+            result = Toontra(detector=two_bubble_detector()).process(
+                image,
+                source=source,
+            )
+
+            self.assertEqual(
+                result.source,
+                source.resolve(),
+            )
 
     def test_long_page_tiling_finds_every_bubble_once(self) -> None:
         # Six predefined boxes, two per 1080px "page" of a 3-page stack, each

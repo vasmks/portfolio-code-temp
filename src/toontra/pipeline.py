@@ -205,7 +205,7 @@ class Toontra:
             )
             for index, detection in enumerate(detections, start=1)
         ]
-        source_path = Path(source) if source is not None else None
+        source_path = Path(source).expanduser().resolve() if source is not None else None
         return PageResult(
             original=original,
             cleaned=cleaned,

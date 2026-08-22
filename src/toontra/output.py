@@ -33,7 +33,14 @@ def save_page_result(
     ]
     crops_dir = destination / "crops"
     if crops_dir.is_dir():
-        owned_files.extend(path for path in crops_dir.glob("bubble_*.png") if path.is_file())
+        owned_files.extend(
+            path
+            for path in crops_dir.iterdir()
+            if path.is_file()
+            and path.suffix == ".png"
+            and path.stem.startswith("bubble_")
+            and path.stem.removeprefix("bubble_").isdigit()
+        )
     _refuse_source_conflict(result, owned_files)
 
     if force:
