@@ -303,7 +303,9 @@ the MA-Net checkpoint run only when the checkpoint path is provided.
 
 ## License
 
-The original code in this reconstruction is available under the MIT License.
-Bundled weights, dependencies, public datasets, and optional model artifacts
-retain their applicable terms; see
+This public reconstruction is licensed under the GNU Affero General Public
+License v3.0 (AGPL-3.0-only).
+
+Third-party dependencies, bundled model weights, public datasets, and optional
+model artifacts retain their applicable terms; see
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

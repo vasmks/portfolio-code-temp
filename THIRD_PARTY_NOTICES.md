@@ -1,5 +1,9 @@
 # Third-party notices
 
+The TOONTRA public reconstruction is licensed under
+AGPL-3.0-only. The licenses listed below apply to the corresponding
+third-party dependencies, datasets, and model artifacts.
+
 Toontra does not redistribute training datasets. It bundles one trained
 checkpoint: `src/toontra/weights/speech_bubble_yolo26s.pt`.
 
