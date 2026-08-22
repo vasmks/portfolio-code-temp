@@ -103,8 +103,6 @@ and construction details.
 
 ## Stages with no public model
 
-`src/toontra/interfaces.py` documents text detection, inpainting, font
-matching, text reinsertion, and image enhancement. These stages existed in
-the original pipeline but are not implemented in this public reconstruction.
-An adapter implements the matching protocol and is passed to the pipeline in
-the same way as a custom `BubbleDetector` or `Translator`.
+The original pipeline also included text detection, inpainting, font matching,
+text reinsertion, and image enhancement. These stages are not implemented in
+this public reconstruction.

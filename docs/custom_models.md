@@ -69,9 +69,9 @@ for the bundled checkpoint provenance.
 
 ## Stages with no bundled model
 
-The original pipeline also included `TextDetector`, `Inpainter`, `FontMatcher`,
-`TextReinserter`, and `ImageEnhancer`. Their interfaces are documented here,
-but these stages are not implemented in this public version.
+The original pipeline also included text detection, inpainting, font matching,
+text reinsertion, and image enhancement. These stages are not implemented in
+this public version.
 
 ## Optional MA-Net masker
 

@@ -13,7 +13,6 @@ from toontra.geometry import (
 )
 from toontra.models import Box, Detection
 
-
 ROOT = Path(__file__).resolve().parent
 
 
@@ -127,7 +126,7 @@ def ownership_flags(
 
     boundaries = [
         current[0] + previous[1]
-        for previous, current in zip(tile_spans, tile_spans[1:])
+        for previous, current in zip(tile_spans, tile_spans[1:], strict=False)
     ]
 
     flags: list[bool] = []
