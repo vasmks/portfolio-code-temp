@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
 from toontra.contracts import validate_translations
-from toontra.errors import ModelContractError
+from toontra.errors import ModelContractError, OptionalDependencyError
 from toontra.models import Box, Detection
 from toontra.modules import (
     CallableBubbleDetector,
@@ -82,6 +83,21 @@ class ComponentContractTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ModelContractError, "confidence"):
             EasyOcrRecognizer(reader=BadReader()).recognize(make_image())
+
+    def test_easyocr_wraps_model_loading_failure(self) -> None:
+        class FakeEasyOcr:
+            @staticmethod
+            def Reader(*args: object, **kwargs: object) -> object:
+                raise RuntimeError("weights unavailable")
+
+        recognizer = EasyOcrRecognizer()
+
+        with patch(
+            "toontra.modules.easyocr_recognizer.importlib.import_module",
+            return_value=FakeEasyOcr,
+        ):
+            with self.assertRaisesRegex(OptionalDependencyError, "could not load its model files"):
+                recognizer.recognize(make_image())
 
     def test_null_recognizer_is_predictable(self) -> None:
         recognition = NullTextRecognizer().recognize(make_image(), language="ko")
