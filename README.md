@@ -205,8 +205,8 @@ Sources:
 
 ### Independent webtoon benchmark
 
-The full tiled pipeline was evaluated on 367 manually annotated speech
-bubbles across three webtoons using 1600 px tiles with 256 px overlap.
+The tiled speech-bubble detector was evaluated on 367 manually annotated
+speech bubbles across three webtoons using 1600 px tiles with 256 px overlap.
 
 | Metric | Value |
 | --- | ---: |
@@ -245,7 +245,7 @@ not change the aggregate benchmark result. See
 
 ### MA-Net segmentation
 
-Verified results from [docs/training/manet_results.json](docs/training/manet_results.json):
+Recorded results from [docs/training/manet_results.json](docs/training/manet_results.json):
 
 | Metric | Value |
 | --- | ---: |

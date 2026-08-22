@@ -90,6 +90,17 @@ separately.
 `src/toontra/assets/sample_webtoon.png` was generated with ChatGPT as synthetic
 demo artwork. It was not used for training or evaluation.
 
+## Independent benchmark annotations
+
+The speech-bubble annotations under `evaluation/benchmark/` were created for
+this project and are provided without the underlying source artwork.
+
+The original webtoon images are not redistributed by this repository and are
+not covered by the TOONTRA repository license. Rights in the source artwork
+remain with their respective owners. Official source pages and additional
+benchmark documentation are listed in
+[evaluation/benchmark/README.md](evaluation/benchmark/README.md).
+
 ## User-provided components
 
 Custom models are supplied by the user through Toontra's component
