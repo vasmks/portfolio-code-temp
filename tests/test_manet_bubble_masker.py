@@ -15,6 +15,7 @@ from toontra.modules import ManetBubbleMasker
 from toontra.modules.manet_bubble_masker import (
     _IMAGE_MEAN,
     _IMAGE_STD,
+    _checkpoint_provenance,
     _preprocess,
     _remove_letterbox,
     _validate_checkpoint,
@@ -113,6 +114,14 @@ class CheckpointValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ModelContractError, "image_size"):
             _validate_checkpoint(valid_payload(image_size=256))
 
+    def test_rejects_wrong_normalization(self) -> None:
+        normalization = {
+            "mean": [0.5, 0.5, 0.5],
+            "std": [0.229, 0.224, 0.225],
+        }
+        with self.assertRaisesRegex(ModelContractError, "normalization"):
+            _validate_checkpoint(valid_payload(normalization=normalization))
+
     def test_rejects_out_of_range_threshold(self) -> None:
         with self.assertRaisesRegex(ModelContractError, "threshold"):
             _validate_checkpoint(valid_payload(threshold=1.5))
@@ -121,6 +130,17 @@ class CheckpointValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ModelContractError, "state_dict"):
             _validate_checkpoint(valid_payload(state_dict={}))
 
+    def test_public_checkpoint_provenance_is_recognized(self) -> None:
+        source_url, license_spdx = _checkpoint_provenance(
+            "6350601676c9e2b5448cf4cf109fb459a1f805d4101cfe34d4db47661f28df21"
+        )
+        self.assertIn("huggingface.co/toontra-research", source_url)
+        self.assertEqual(license_spdx, "Apache-2.0")
+
+    def test_unknown_checkpoint_has_no_public_provenance(self) -> None:
+        source_url, license_spdx = _checkpoint_provenance("0" * 64)
+        self.assertIsNone(source_url)
+        self.assertIsNone(license_spdx)
 
 class ConstructorErrorTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -198,6 +218,8 @@ class RealArchitectureTests(unittest.TestCase):
         masker = ManetBubbleMasker(self.checkpoint_path)
         self.assertEqual(masker.threshold, 0.45)
         self.assertEqual(masker.metadata.version, "Roboflow manga-segment_v2 v5")
+        self.assertIsNone(masker.metadata.source_url)
+        self.assertIsNone(masker.metadata.license_spdx)
         self.assertIsNotNone(masker.metadata.sha256)
 
     def test_threshold_override_takes_precedence_over_checkpoint(self) -> None:

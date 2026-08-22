@@ -55,12 +55,17 @@ needs no model download, GPU, or account.
 
 `ManetBubbleMasker` (`src/toontra/modules/manet_bubble_masker.py`) provides
 MA-Net-based speech-bubble segmentation as an alternative to `WhiteBubbleMasker`.
-Its separately distributed checkpoint, `toontra_manet_resnet34_bubble_segmentation.pth`,
-was trained for this public reconstruction using Segmentation Models PyTorch's
-`MAnet` with a `resnet34` encoder, fine-tuned on the public Roboflow
-[`manga-segment_v2`](https://universe.roboflow.com/), version 5,
-speech-bubble segmentation dataset. It is a new checkpoint produced by this
-training run, not the original production checkpoint.
+Its separately distributed checkpoint was trained for this public
+reconstruction using Segmentation Models PyTorch's `MAnet` with a `resnet34`
+encoder, fine-tuned on the public Roboflow
+[`manga-segment_v2`](https://universe.roboflow.com/ashu-biqfs/manga-segment_v2),
+version 5 speech-bubble segmentation dataset. It is a new checkpoint produced
+by this training run, not the original production checkpoint.
+
+The public checkpoint is hosted as `manet_bubble_segmentation.pth` at
+[toontra-research/toontra-manet-bubble-segmentation](https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation/tree/f2f1c4eb1b2f7c492146da82d51fa474f54560cc).
+It is licensed under Apache-2.0 and has SHA256
+`6350601676c9e2b5448cf4cf109fb459a1f805d4101cfe34d4db47661f28df21`.
 
 Evaluation numbers from
 [docs/training/manet_results.json](training/manet_results.json) at the best
@@ -77,14 +82,15 @@ Full per-epoch training history is in
 [docs/training/manet_training_history.csv](training/manet_training_history.csv).
 These results apply to the recorded training run and dataset split.
 
-The adapter and its runtime (`torch`, `segmentation-models-pytorch`) are
-optional and are installed with `pip install -e ".[manet]"`; the rest of
-Toontra does not require them. The checkpoint is distributed separately and
-is not stored in Git or included in package data. `ManetBubbleMasker` requires
-an explicit checkpoint path, does not download weights, and does not select
-`WhiteBubbleMasker` automatically. See
-[custom_models.md](custom_models.md#optional-ma-net-masker) for the
-preprocessing and construction details.
+MA-Net support is installed with `pip install -e ".[manet]"`, which adds
+`segmentation-models-pytorch` and explicitly includes PyTorch for this adapter.
+PyTorch may already be present through other dependencies. The checkpoint is
+distributed separately and is not stored in Git or included in package data.
+
+`ManetBubbleMasker` requires an explicit checkpoint path and does not download
+weights automatically. See
+[custom_models.md](custom_models.md#optional-ma-net-masker) for preprocessing
+and construction details.
 
 ## Other optional adapters
 

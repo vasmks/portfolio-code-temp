@@ -36,6 +36,21 @@ _EXPECTED_METADATA: dict[str, object] = {
     "image_size": _INPUT_SIZE,
 }
 
+_PUBLIC_CHECKPOINT_SHA256 = (
+    "6350601676c9e2b5448cf4cf109fb459a1f805d4101cfe34d4db47661f28df21"
+)
+_PUBLIC_CHECKPOINT_SOURCE_URL = (
+    "https://huggingface.co/toontra-research/"
+    "toontra-manet-bubble-segmentation/tree/"
+    "f2f1c4eb1b2f7c492146da82d51fa474f54560cc"
+)
+_PUBLIC_CHECKPOINT_LICENSE = "Apache-2.0"
+
+
+def _checkpoint_provenance(sha256: str) -> tuple[str | None, str | None]:
+    if sha256.lower() == _PUBLIC_CHECKPOINT_SHA256:
+        return _PUBLIC_CHECKPOINT_SOURCE_URL, _PUBLIC_CHECKPOINT_LICENSE
+    return None, None
 
 class ManetBubbleMasker:
     """Segment a bubble crop with the MA-Net/ResNet34 checkpoint.
@@ -84,11 +99,15 @@ class ManetBubbleMasker:
         self.checkpoint_path = path
         self.device = resolved_device
         self.threshold = threshold if threshold is not None else float(payload["threshold"])
+        checkpoint_sha256 = _checkpoint_sha256(path)
+        source_url, license_spdx = _checkpoint_provenance(checkpoint_sha256)
+
         self.metadata = ModelMetadata(
             name="Toontra MA-Net ResNet34 speech-bubble masker",
             version=f"{payload['training_dataset']} v{payload['training_dataset_version']}",
-            source_url="https://github.com/qubvel-org/segmentation_models.pytorch",
-            sha256=_checkpoint_sha256(path),
+            source_url=source_url,
+            license_spdx=license_spdx,
+            sha256=checkpoint_sha256,
         )
 
         self._model = model.to(resolved_device)
@@ -152,6 +171,31 @@ def _validate_checkpoint(payload: object) -> dict[str, Any]:
             raise ModelContractError(
                 f"MA-Net checkpoint metadata {key!r} must be {expected!r}, "
                 f"got {payload.get(key)!r}"
+            )
+
+    normalization = payload.get("normalization")
+    if not isinstance(normalization, dict):
+        raise ModelContractError(
+            "MA-Net checkpoint normalization must contain mean and std values"
+        )
+
+    for key, expected in (("mean", _IMAGE_MEAN), ("std", _IMAGE_STD)):
+        try:
+            actual = np.asarray(normalization.get(key), dtype=np.float32)
+        except (TypeError, ValueError) as error:
+            raise ModelContractError(
+                f"MA-Net checkpoint normalization {key!r} is invalid"
+            ) from error
+
+        if actual.shape != expected.shape or not np.allclose(
+            actual,
+            expected,
+            rtol=0.0,
+            atol=1e-6,
+        ):
+            raise ModelContractError(
+                f"MA-Net checkpoint normalization {key!r} does not match "
+                "the adapter preprocessing"
             )
 
     threshold = payload.get("threshold")

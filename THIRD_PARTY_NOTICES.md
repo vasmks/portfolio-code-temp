@@ -65,14 +65,20 @@ details.
 - Segmentation Models PyTorch source:
   <https://github.com/qubvel-org/segmentation_models.pytorch>
 - Segmentation Models PyTorch license: MIT
-- Behavior: both packages are installed only through the optional `manet`
-  extra (`pip install -e ".[manet]"`) and are never required by the base
-  install. `ManetBubbleMasker` performs no model download; the checkpoint
+- Behavior: `segmentation-models-pytorch` is installed through the optional
+  `manet` extra (`pip install -e ".[manet]"`). PyTorch is also listed in that
+  extra for MA-Net support, but may already be present through other
+  dependencies. `ManetBubbleMasker` performs no model download; the checkpoint
   path is always supplied explicitly.
-- Optional checkpoint: `toontra_manet_resnet34_bubble_segmentation.pth` was
-  trained for this public reconstruction (MA-Net, `resnet34` encoder) on the public
-  Roboflow "manga-segment_v2" dataset, version 5. The checkpoint is
-  distributed separately and is excluded from Git and package data. See
+- Optional checkpoint: the public MA-Net checkpoint is hosted as
+  `manet_bubble_segmentation.pth` at
+  https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation/tree/f2f1c4eb1b2f7c492146da82d51fa474f54560cc
+  and has SHA256
+  `6350601676c9e2b5448cf4cf109fb459a1f805d4101cfe34d4db47661f28df21`.
+  The checkpoint is licensed under Apache-2.0 and was trained for this public
+  reconstruction using MA-Net with a ResNet34 encoder on Roboflow
+  `manga-segment_v2`, version 5. It is distributed separately and is excluded
+  from Git and package data. See
   [docs/model_choices.md](docs/model_choices.md) for evaluation numbers and
   [docs/training/](docs/training/) for the training record.
 

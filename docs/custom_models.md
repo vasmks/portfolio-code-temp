@@ -115,6 +115,10 @@ After inference, the predicted mask is thresholded using the value stored in
 the checkpoint. A different threshold can be supplied with `threshold=`. The
 padding is then removed and the mask is resized back to the original crop size.
 
+The checkpoint metadata records `crop_padding=0.15`, which describes the
+padding used when preparing training crops. It is not applied by the masker at
+runtime.
+
 The crop passed to `ManetBubbleMasker` has already been expanded by the main
 pipeline, so the masker does not apply any additional expansion.
 

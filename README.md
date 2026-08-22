@@ -124,9 +124,15 @@ See [docs/model_choices.md](docs/model_choices.md) for training provenance and
 `ManetBubbleMasker` uses an MA-Net model with a ResNet34 encoder for speech-bubble
 segmentation. The checkpoint is distributed separately and is not stored in this repository.
 
-- Filename: `toontra_manet_resnet34_bubble_segmentation.pth`
-- Checkpoint: [toontra-research/toontra-manet-bubble-segmentation](https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation)
+- Hosted filename: `manet_bubble_segmentation.pth`
+- Checkpoint: [toontra-research/toontra-manet-bubble-segmentation](https://huggingface.co/toontra-research/toontra-manet-bubble-segmentation/tree/f2f1c4eb1b2f7c492146da82d51fa474f54560cc)
+- SHA256: `6350601676c9e2b5448cf4cf109fb459a1f805d4101cfe34d4db47661f28df21`
+- License: Apache-2.0
 - Optional dependencies: `python -m pip install -e ".[manet]"`
+
+The examples below use a local copy renamed to
+`toontra_manet_resnet34_bubble_segmentation.pth`; the adapter accepts any
+compatible checkpoint path.
 
 Supply the checkpoint path explicitly; the model is not downloaded
 automatically.
