@@ -39,6 +39,26 @@ class CliTests(unittest.TestCase):
             self.assertEqual(main(["demo", "--output", str(output)]), 2)
             self.assertEqual(main(["demo", "--output", str(output), "--force"]), 0)
 
+    def test_demo_force_does_not_write_through_existing_source_file(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="toontra-cli-") as directory:
+            root = Path(directory)
+            output = root / "demo"
+            external = root / "external.png"
+
+            output.mkdir()
+            external.write_bytes(b"external")
+
+            source_target = output / "source.png"
+            source_target.hardlink_to(external)
+
+            self.assertEqual(
+                main(["demo", "--output", str(output), "--force"]),
+                0,
+            )
+
+            self.assertEqual(external.read_bytes(), b"external")
+            self.assertNotEqual(source_target.read_bytes(), b"external")
+
 
 if __name__ == "__main__":
     unittest.main()

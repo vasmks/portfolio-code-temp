@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from . import __version__
-from .errors import ToontraError
+from .errors import OutputExistsError, ToontraError
 from .imaging import load_rgb, save_rgb
 from .pipeline import Toontra
 
@@ -85,6 +85,13 @@ def _run_demo(args: argparse.Namespace) -> int:
     source = load_rgb(SAMPLE_WEBTOON)
     toontra = Toontra()
     result = toontra.process(source)
+    source_target = Path(args.output) / "source.png"
+    if args.force and (source_target.exists() or source_target.is_symlink()):
+        if source_target.is_dir() and not source_target.is_symlink():
+            raise OutputExistsError(
+                f"Output target is a directory: {source_target}"
+            )
+        source_target.unlink()
     destination = result.save(
         args.output,
         save_crops=args.save_crops,

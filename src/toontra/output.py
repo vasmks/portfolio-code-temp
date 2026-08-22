@@ -32,6 +32,11 @@ def save_page_result(
         destination / "result.json",
     ]
     crops_dir = destination / "crops"
+    if _is_linked_directory(crops_dir):
+        raise OutputExistsError(
+            f"Refusing to use a linked crops directory: {crops_dir}"
+        )
+
     if crops_dir.is_dir():
         owned_files.extend(
             path
@@ -78,3 +83,7 @@ def _refuse_source_conflict(result: PageResult, targets: list[Path]) -> None:
             raise OutputExistsError(
                 f"Refusing to overwrite the input image with an output artifact: {source}"
             )
+
+def _is_linked_directory(path: Path) -> bool:
+    is_junction = getattr(path, "is_junction", None)
+    return path.is_symlink() or (is_junction is not None and is_junction())

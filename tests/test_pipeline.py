@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -142,6 +144,43 @@ class PipelineTests(unittest.TestCase):
                 result.source,
                 source.resolve(),
             )
+
+    def test_output_rejects_linked_crops_directory(self) -> None:
+        result = Toontra(detector=two_bubble_detector()).process(
+            create_synthetic_webtoon()
+        )
+
+        with tempfile.TemporaryDirectory(prefix="toontra-output-") as directory:
+            root = Path(directory)
+            output = root / "page"
+            external_crops = root / "external_crops"
+
+            output.mkdir()
+            external_crops.mkdir()
+
+            crops_link = output / "crops"
+
+            if os.name == "nt":
+                result_link = subprocess.run(
+                    ["cmd", "/c", "mklink", "/J", str(crops_link), str(external_crops)],
+                    capture_output=True,
+                    text=True,
+                )
+                if result_link.returncode != 0:
+                    self.skipTest(f"directory junctions are unavailable: {result_link.stderr}")
+            else:
+                try:
+                    crops_link.symlink_to(external_crops, target_is_directory=True)
+                except OSError as error:
+                    self.skipTest(f"directory symlinks are unavailable: {error}")
+
+            external_file = external_crops / "bubble_999.png"
+            external_file.write_bytes(b"external")
+
+            with self.assertRaises(OutputExistsError):
+                result.save(output, save_crops=True, force=True)
+
+            self.assertEqual(external_file.read_bytes(), b"external")
 
     def test_long_page_tiling_finds_every_bubble_once(self) -> None:
         # Six predefined boxes, two per 1080px "page" of a 3-page stack, each
