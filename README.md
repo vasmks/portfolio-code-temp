@@ -114,7 +114,20 @@ returns a list. Box coordinates use half-open `xyxy` bounds, so
 
 `Yolo26BubbleDetector` is the default detector. It uses the bundled
 `speech_bubble_yolo26s.pt` checkpoint, which was fine-tuned for this reconstruction
-on a public speech-bubble dataset. The default inference image size is 800 pixels.
+on a public speech-bubble dataset.
+
+Default detector and long-page settings:
+
+| Setting | Default |
+| --- | ---: |
+| Detector confidence | 0.25 |
+| Detector NMS IoU | 0.70 |
+| Inference image size | 800 px |
+| Tile height | 1600 px |
+| Tile overlap | 256 px |
+| Cross-tile duplicate IoU | 0.50 |
+| Cross-tile containment | 0.80 |
+| Detection expansion | 5% per side |
 
 See [docs/model_choices.md](docs/model_choices.md) for training provenance and
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for dependency licenses.
