@@ -54,7 +54,7 @@
       "iou": 0.495961,
       "status": "false_negative"
     },
-    "ownership": {
+    "runtime": {
       "tile_id": 73,
       "score": 0.914397,
       "iou": 0.510663,

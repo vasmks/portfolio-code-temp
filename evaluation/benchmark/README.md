@@ -37,7 +37,7 @@ python evaluation/benchmark/evaluate.py
 The evaluator reports three post-processing configurations:
 
 - global NMS
-- the shipped runtime path: tile ownership with cross-tile NMS
+- the runtime path: tile ownership with cross-tile NMS
 - tile ownership followed by additional same-tile NMS
 
 using the fixed benchmark configuration recorded in

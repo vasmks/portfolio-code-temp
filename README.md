@@ -220,8 +220,9 @@ Sources:
 
 ### Independent webtoon benchmark
 
-The shipped tiled detector was evaluated on 367 manually annotated speech
-bubbles across three webtoons using 1600 px tiles with 256 px overlap.
+Saved predictions from the current detector were processed with the same
+post-processing used by the runtime pipeline and evaluated on 367 manually
+annotated speech bubbles across three webtoons.
 
 | Metric | Value |
 | --- | ---: |
@@ -233,7 +234,7 @@ bubbles across three webtoons using 1600 px tiles with 256 px overlap.
 These results use the same ownership-based cross-tile deduplication as the
 runtime pipeline. A separate experiment added same-tile NMS after ownership
 and reduced the false positives from 25 to 19, giving F1 0.920. Same-tile NMS
-is not used by the shipped pipeline because overlapping detections from the
+is not used by the runtime pipeline because overlapping detections from the
 same tile can represent separate bubbles. See
 [evaluation/detector_benchmark.json](evaluation/detector_benchmark.json).
 
@@ -252,13 +253,13 @@ YOLOv7 using the same tiling and evaluation settings.
 The aggregate improvement was small, but one seam case showed the intended
 behavior clearly. Global NMS kept the higher-confidence detection from the
 neighboring tile, giving IoU 0.496 and missing the 0.50 match threshold.
-Ownership selected the detection from the correct tile region instead, with
-IoU 0.511, recovering that annotation without losing another ground-truth
-match.
+The runtime ownership path selected the detection from the correct tile region
+instead, with IoU 0.511, recovering that annotation without losing another
+ground-truth match.
 
 With YOLO26, ownership plus same-tile NMS reduced false positives compared
-with the shipped runtime path, but same-tile NMS remains an evaluation
-experiment rather than part of the runtime pipeline. See
+with the runtime path, but same-tile NMS remains an evaluation experiment
+rather than part of the runtime pipeline. See
 [evaluation/yolov7_ownership_comparison.json](evaluation/yolov7_ownership_comparison.json).
 
 ### MA-Net segmentation
