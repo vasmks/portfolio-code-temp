@@ -58,6 +58,7 @@ class Yolo26DetectorContractTests(unittest.TestCase):
         detector.confidence_threshold = 0.25
         detector.iou_threshold = 0.7
         detector.imgsz = 800
+        detector.device = None
         detector._model = SimpleNamespace(predict=predict)
 
         self.assertEqual(detector.detect(rgb), [])
@@ -90,6 +91,22 @@ class Yolo26DetectorContractTests(unittest.TestCase):
             boxes,
             sorted(boxes, key=lambda box: (box.y1, box.x1, box.y2, box.x2)),
         )
+
+    def test_detect_forwards_explicit_device_to_ultralytics(self) -> None:
+        image = np.full((64, 64, 3), 255, dtype=np.uint8)
+        predict = Mock(
+            return_value=[SimpleNamespace(boxes=SimpleNamespace(xyxy=[], conf=[]))]
+        )
+
+        detector = object.__new__(Yolo26BubbleDetector)
+        detector.confidence_threshold = 0.25
+        detector.iou_threshold = 0.7
+        detector.imgsz = 800
+        detector.device = "cpu"
+        detector._model = SimpleNamespace(predict=predict)
+
+        self.assertEqual(detector.detect(image), [])
+        self.assertEqual(predict.call_args.kwargs["device"], "cpu")
 
 
 if __name__ == "__main__":

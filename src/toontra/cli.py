@@ -113,7 +113,12 @@ def _run_process(args: argparse.Namespace) -> int:
 
         masker = ManetBubbleMasker(args.manet_checkpoint, device=args.device)
 
+    from .modules import Yolo26BubbleDetector
+
+    detector_device = None if args.device == "auto" else args.device
+    detector = Yolo26BubbleDetector(device=detector_device)
     toontra = Toontra(
+        detector=detector,
         masker=masker,
         recognizer=recognizer,
         tile_height=args.tile_height,

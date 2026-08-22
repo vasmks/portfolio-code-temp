@@ -32,6 +32,7 @@ class Yolo26BubbleDetector:
         confidence_threshold: float = 0.25,
         iou_threshold: float = 0.7,
         imgsz: int = 800,
+        device: str | None = None,
     ) -> None:
         if not WEIGHTS_PATH.is_file():
             raise FileNotFoundError(f"YOLO26 weights not found at {WEIGHTS_PATH}")
@@ -47,6 +48,7 @@ class Yolo26BubbleDetector:
         self.confidence_threshold = confidence_threshold
         self.iou_threshold = iou_threshold
         self.imgsz = imgsz
+        self.device = device
         self._model = YOLO(str(WEIGHTS_PATH))
         self.metadata = ModelMetadata(
             name="YOLO26s speech-bubble detector",
@@ -60,13 +62,19 @@ class Yolo26BubbleDetector:
         rgb = validate_rgb_image(image)
         height, width = rgb.shape[:2]
         bgr = np.ascontiguousarray(rgb[..., ::-1])
+        predict_kwargs = {
+            "conf": self.confidence_threshold,
+            "iou": self.iou_threshold,
+            "imgsz": self.imgsz,
+            "end2end": False,
+            "verbose": False,
+        }
+        if self.device is not None:
+            predict_kwargs["device"] = self.device
+
         results = self._model.predict(
             bgr,
-            conf=self.confidence_threshold,
-            iou=self.iou_threshold,
-            imgsz=self.imgsz,
-            end2end=False,
-            verbose=False,
+            **predict_kwargs,
         )[0]
 
         detections: list[Detection] = []

@@ -26,7 +26,7 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.tile_overlap, 256)
 
     def test_demo_writes_documented_artifacts_and_overwrite_is_explicit(self) -> None:
-        # The procedural page exercises the real default detector and output
+        # The bundled sample exercises the real default detector and output
         # contract; detector accuracy is evaluated separately.
         with tempfile.TemporaryDirectory(prefix="toontra-cli-") as directory:
             output = Path(directory) / "demo"
