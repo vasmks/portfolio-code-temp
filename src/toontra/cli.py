@@ -5,6 +5,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from . import __version__
 from .errors import ToontraError
 from .imaging import load_rgb, save_rgb
 from .pipeline import Toontra
@@ -17,7 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="toontra",
         description="Detect and erase speech-bubble contents from webtoon images.",
     )
-    parser.add_argument("--version", action="version", version="Toontra 0.1.0")
+    parser.add_argument("--version", action="version", version=f"Toontra {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
 
     process = commands.add_parser("process", help="Process a PNG or JPEG page")

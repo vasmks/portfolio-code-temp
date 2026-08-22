@@ -1,5 +1,7 @@
 """Public Toontra reconstruction API."""
 
+from importlib.metadata import version
+
 from .errors import (
     ImageValidationError,
     ModelContractError,
@@ -10,7 +12,7 @@ from .errors import (
 from .models import Box, BubbleResult, Detection, ModelMetadata, PageResult, Recognition
 from .pipeline import Toontra
 
-__version__ = "0.1.0"
+__version__ = version("toontra")
 
 __all__ = [
     "Box",
